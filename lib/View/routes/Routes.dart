@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:justwravel/View/HomeView/home.dart';
-import '../Routes/RoutesName.dart';
 import '../onboard/onboard_screen.dart';
+import 'RoutesName.dart';
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {

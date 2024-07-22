@@ -7,7 +7,6 @@ import 'package:justwravel/res/app_theme.dart';
 import 'package:justwravel/viewmodel/HomeViewModel.dart';
 import 'package:provider/provider.dart';
 
-import 'View/Routes/RoutesName.dart';
 import 'View/routes/Routes.dart';
 
 void main() async {

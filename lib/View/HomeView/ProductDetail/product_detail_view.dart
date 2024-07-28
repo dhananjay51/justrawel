@@ -135,7 +135,7 @@ class ProductDetailView extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height: 30),
-                                  IntroScreen(),
+                                   IntroScreen(),
                                   SizedBox(height: 10),
                                   Detaillist(),
                                   Reviewitemslist(),

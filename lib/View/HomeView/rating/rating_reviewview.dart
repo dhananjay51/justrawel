@@ -1,5 +1,7 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:justwravel/View/HomeView/category/category_item.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/response/api_status.dart';
@@ -46,16 +48,16 @@ class _PopularListViewState extends State<RatingReviewView> {
 
                   return Container(
                      margin: EdgeInsets.all(12),
+
                       child:
-                   Row(children: [
+                   Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                       children: [
 
-
-                   // padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-
-                    _RatingView(),
-                    //  SizedBox(width:15),
-                      Spacer(),
-                    _ReViewView(),
+                    Expanded(child: _RatingView()),
+                      SizedBox(width:10),
+                     
+                    Expanded(child: _ReViewView()),
                   ]));
                 default:
                   return const Text("Best seller default");
@@ -89,7 +91,7 @@ class _PopularListViewState extends State<RatingReviewView> {
 
         Image.asset("assets/images/Rating.png"),
          SizedBox(width: 5),
-         Text("4.8 Star Rating", style: AppStyle.instance.bodySmallBold.copyWith(
+         Text("4.8 Star Rating", style: AppStyle.instance.bodySemi.copyWith(
            color: AppColors.blackColor,
          )),
 
@@ -121,10 +123,10 @@ class _PopularListViewState extends State<RatingReviewView> {
 
             Image.asset("assets/images/Reviews.png"),
                SizedBox(width: 5),
-              Text("24900 + " ,style: AppStyle.instance.bodySmallBold.copyWith(
+              Text("24900 + " ,style: AppStyle.instance.bodySemi.copyWith(
               color: AppColors.blackColor,
               )),
-              Text( "Reviews",style: AppStyle.instance.bodyLight10.copyWith(
+              Text( "Reviews",style: AppStyle.instance.bodySmall.copyWith(
                 color: AppColors.blackColor,
               ))]),
          height:  40,

@@ -56,6 +56,18 @@ class AppStyle {
       fontWeight: FontWeight.w600
 
   );
+  final TextStyle bodyTooSemi = Typogaphy.SemiBold.copyWith(
+      color: AppColors.whiteColor,
+      fontSize: 13,
+      fontWeight: FontWeight.w600
+
+  );
+  final TextStyle bodyToo1Semi = Typogaphy.SemiBold.copyWith(
+      color: AppColors.whiteColor,
+      fontSize: 12,
+      fontWeight: FontWeight.w500
+
+  );
   final TextStyle bodyLight10 = Typogaphy.Light.copyWith(
       color: AppColors.whiteColor,
       fontSize: 8,

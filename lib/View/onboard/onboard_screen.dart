@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../res/components/text_sub_widget.dart';
 import '../../res/components/title_text_widget.dart';
 import '../../res/constant/string_constant.dart';
-import '../Routes/RoutesName.dart';
+import '../routes/RoutesName.dart';
 
 class OnboardScreen extends StatelessWidget {
   const OnboardScreen({Key? key}) : super(key: key);

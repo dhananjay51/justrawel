@@ -12,4 +12,7 @@ class AppColors {
   static const Color appbarlinearColor = Color(0xFF2E4FA4);
   static const Color appbarlinear1Color = Color(0xFFE4FA4);
   static const Color backGroundColor = Color(0xFFF4F4F4);
+  static const Color blueGroundColor = Color(0xFFEEF8FF);
+  static const Color musturedGroundColor = Color(0xFFFFAF21);
+  static const Color lightOrangeGroundColor = Color(0xFFFFF7E8);
 }

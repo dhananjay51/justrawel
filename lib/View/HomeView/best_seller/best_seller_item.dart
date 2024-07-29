@@ -72,7 +72,7 @@ class BestSellerItem extends StatelessWidget {
 
     return
    Text(dataItem.title.toString(),
-        style: AppStyle.instance.bodySmallBold.copyWith(
+        style: AppStyle.instance.bodySemi.copyWith(
           color: AppColors.whiteColor,
         ));
   }
@@ -147,7 +147,7 @@ class BestSellerItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(right: 5, left: 5),
       width: width,
-      height: 200,
+      height: 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         image: const DecorationImage(

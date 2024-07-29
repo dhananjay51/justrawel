@@ -57,6 +57,7 @@ dependencies:
   youtube_player_flutter: ^8.1.2
   custom_sliding_segmented_control: ^1.8.3
   readmore: ^3.0.0
+  percent_indicator: ^4.2.3
 
 
 

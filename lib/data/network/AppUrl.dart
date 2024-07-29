@@ -29,7 +29,7 @@ class AppUrl {
   static var   customInternationalPackage      =     '$appBaseUrl/api/international-CustomizedPackages';
   static var   customizedpackagesstatelist     =     '$appBaseUrl/api/CustomizedPackages-state/';
   static var   custominternationalPackagelist  =     '$appBaseUrl/api/CustomizedPackages-country/';
-  static var   PackageDetails  =     '$appBaseUrl/api/package-detail/';
+  static var   PackageDetails  =     '$appBaseUrl/api/package-detail/parashar-lake-trek';
 
   }
 
@@ -43,7 +43,7 @@ class AppUrl {
   internationalPath,
   PackageListinPath,
   VideoImgpath
-}
+  }
 extension ImageExtension on Imagepath {
   String get description {
     switch (this) {
@@ -63,10 +63,8 @@ extension ImageExtension on Imagepath {
         return 'https://storage.googleapis.com/storage.justwravel.tech/homepage/international/';
       case Imagepath.PackageListinPath:
         return 'https://storage.googleapis.com/storage.justwravel.tech/package/images/banner/detail_desktop/cropped/';
-
-      case Imagepath.VideoImgpath:
+        case Imagepath.VideoImgpath:
         return 'https://storage.googleapis.com/storage.justwravel.com/package/images/banner/video_support/cropped/';
-
         //'https://storage.googleapis.com/storage.justwravel.tech/package/images/banner/listing_mobile/cropped/';
         default:
         return 'Unknown case';

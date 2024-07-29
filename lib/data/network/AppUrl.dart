@@ -29,7 +29,7 @@ class AppUrl {
   static var   customInternationalPackage      =     '$appBaseUrl/api/international-CustomizedPackages';
   static var   customizedpackagesstatelist     =     '$appBaseUrl/api/CustomizedPackages-state/';
   static var   custominternationalPackagelist  =     '$appBaseUrl/api/CustomizedPackages-country/';
-  static var   PackageDetails  =     '$appBaseUrl/api/package-detail/parashar-lake-trek';
+  static var   PackageDetails  =     '$appBaseUrl/api/package-detail/';
 
   }
 

@@ -33,8 +33,10 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 class ProductDetailView extends StatefulWidget {
+ final String slug;
   ProductDetailView({
     super.key,
+     required this.slug
   });
   @override
   _ProductDetailViewState createState() => _ProductDetailViewState();
@@ -45,7 +47,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   @override
   void initState() {
 
-    homeViewViewModel.fetchPackingDetail(AppUrl.PackageDetails);
+     print(AppUrl.PackageDetails + widget.slug);
+    homeViewViewModel.fetchPackingDetail(AppUrl.PackageDetails + widget.slug);
 
     super.initState();
   }

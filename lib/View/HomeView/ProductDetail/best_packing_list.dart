@@ -409,20 +409,20 @@ class _ProItemsState extends State<ProItems> {
   }
 
   Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
-    return GestureDetector(
-        onTap: () {
 
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView()));
-        },
 
-        child: ListView.builder(
+    return  ListView.builder(
 
             itemCount: value.getPackageViewAllList.data?.data?.data?.length,
             shrinkWrap: true,
             physics: ScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
-              return
-                Card(
+              return GestureDetector(
+                  onTap: () {
+
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+              },
+              child:  Card(
                     color: Colors.white,
                     elevation: 16,
                     shape: RoundedRectangleBorder(
@@ -564,9 +564,9 @@ class _ProItemsState extends State<ProItems> {
                             padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
                             child: Menulist(),
                           ),
-                        ]));
+                        ])));
 
-            }));
+            });
   }
 
   String getImage(List<ViewAllPackageImage> inputlist) {
@@ -748,17 +748,17 @@ class _CustomPackagItemsState extends State<CustomPackage> {
 
   }
   Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
-    return GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView()));
-        },
-        child: ListView.builder(
+
+      return  ListView.builder(
             itemCount: value.getPackageViewAllList.data?.data?.data?.length,
             shrinkWrap: true,
             physics: ScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
-              return
-                Card(
+              return GestureDetector(
+                  onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+              },
+              child:  Card(
                     color: Colors.white,
                     elevation: 16,
                     shape: RoundedRectangleBorder(
@@ -901,9 +901,9 @@ class _CustomPackagItemsState extends State<CustomPackage> {
                             padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
                             child: Menulist(),
                           ),
-                        ]));
+                        ])));
 
-            }));
+            });
   }
 
   String getImage(List<ViewAllPackageImage> inputlist) {

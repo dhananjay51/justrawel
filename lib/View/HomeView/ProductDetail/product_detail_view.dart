@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:justwravel/View/HomeView/carousel_slider.dart';
 import 'package:justwravel/data/network/AppUrl.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import '../../../models/up_coming_trips_model.dart';
 import '../../../res/color.dart';
 import '../../../res/components/not_avaible_photo.dart';
@@ -20,24 +19,36 @@ import '../../../res/color.dart';
 import 'package:justwravel/View/HomeView/client/client_view.dart';
 import 'package:justwravel/View/HomeView/ProductDetail/package_list_items.dart';
 import 'package:justwravel/View/HomeView/ProductDetail/package_list_view.dart';
- import 'package:justwravel/models/package_details_model.dart';
- import 'package:justwravel/data/network/AppUrl.dart';
- import 'package:justwravel/models/package_details_model.dart';
- import 'package:justwravel/repository/HomeRepository.dart';
+import 'package:justwravel/models/package_details_model.dart';
+import 'package:justwravel/data/network/AppUrl.dart';
+import 'package:justwravel/models/package_details_model.dart';
+import 'package:justwravel/repository/HomeRepository.dart';
 
 import '../../../../data/response/api_status.dart';
 import 'package:provider/provider.dart';
 import 'package:justwravel/viewmodel/HomeViewModel.dart';
 import 'package:readmore/readmore.dart';
+import 'package:justwravel/View/HomeView/best_seller/best_seller_item.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:flutter_html/flutter_html.dart';
 
-import '../best_seller/best_seller_item.dart';
-
-
-class ProductDetailView extends StatelessWidget {
-  const ProductDetailView({
+class ProductDetailView extends StatefulWidget {
+  ProductDetailView({
     super.key,
   });
+  @override
+  _ProductDetailViewState createState() => _ProductDetailViewState();
+}
+class _ProductDetailViewState extends State<ProductDetailView> {
+  HomeViewViewModel homeViewViewModel = HomeViewViewModel();
 
+  @override
+  void initState() {
+
+    homeViewViewModel.fetchPackingDetail(AppUrl.PackageDetails);
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,41 +68,6 @@ class ProductDetailView extends StatelessWidget {
           ),
 
           automaticallyImplyLeading: true,
-
-          actions: [
-            IconButton(
-                onPressed: (){
-                  /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-                  //action coe when button is pressed
-                },
-                icon:  Container(
-
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEDEDF1),
-                      shape: BoxShape.circle,
-                    ),
-                    //  borderRadius: BorderRadius.circular(23)),
-                    child:  Image.asset("assets/images/Logoslider.png") //Icon(Icons.search, color: Colors.white),
-                )),
-            IconButton(
-                onPressed: (){
-                  /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-                  //action coe when button is pressed
-                },
-                icon:  Container(
-
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEDEDF1),
-                      shape: BoxShape.circle,
-                    ),
-                    //  borderRadius: BorderRadius.circular(23)),
-                    child:Image.asset("assets/images/search.png") //Icon(Icons.search, color: Colors.white),
-                )),
-          ],
 
           leading: IconButton(
             onPressed: (){
@@ -126,6 +102,69 @@ class ProductDetailView extends StatelessWidget {
                 child: Column(
                   //crossAxisAlignment: ,
                     children: <Widget>[
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 1),
+
+                        child:   ChangeNotifierProvider<HomeViewViewModel>(
+                            create: (BuildContext context) => homeViewViewModel,
+                            child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
+                              switch (value.getPackageDetails.apiStatus) {
+                                case ApiStatus.LOADING:
+                                  return SizedBox(
+                                    height: 200,
+                                    child: const Center(child: CircularProgressIndicator()),
+                                  );
+                                case ApiStatus.ERROR:
+                                  return Text(value.getPackageDetails.toString());
+
+                                case ApiStatus.COMPLETED:
+                                  return Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 30),
+                                        IntroScreen(),
+                                        SizedBox(height: 10),
+                                        Detaillist(),
+                                        Reviewitemslist(),
+                                        SizedBox(height: 30),
+                                        PackageInfoDetail(packageurl: "", type: "", packageDetail: value.getPackageDetails.data!.data!.data!.first),
+                                        SizedBox(height: 30),
+                                        SimilarPackageListView(),
+                                        //SizedBox(height: 30),
+                                        Center(
+                                          child: Text("Videos"),
+                                        ),
+                                        Center(
+                                          child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
+                                            color: AppColors.blackColor,
+                                          )),
+                                        ),
+                                        Memories(sendType:""),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Center(
+
+                                              child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
+                                                color: AppColors.blackColor,
+                                              )),
+                                            ),
+                                          ],
+                                        ),
+
+                                        ClientView(),
+
+                                      ]);
+                                default:
+                                  return const Text("Best seller default");
+                              }
+                            })
+                        ),
+                      ),
+
+                      /*
                       Container(
                           color: AppColors.backGroundColor,
                           child: Padding(
@@ -134,15 +173,22 @@ class ProductDetailView extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+
                                   SizedBox(height: 30),
-                                   IntroScreen(),
+
+                                  IntroScreen(),
+
                                   SizedBox(height: 10),
                                   Detaillist(),
+
                                   Reviewitemslist(),
+
                                   SizedBox(height: 30),
+
                                   PackageInfoDetail(packageurl: "", type: ""),
+
                                   SizedBox(height: 30),
-                                  SimilarPackageListView(),
+
                                   Center(
                                     child: Text("Videos"),
                                   ),
@@ -151,10 +197,7 @@ class ProductDetailView extends StatelessWidget {
                                       color: AppColors.blackColor,
                                     )),
                                   ),
-
                                   Memories(sendType:""),
-
-
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -172,9 +215,14 @@ class ProductDetailView extends StatelessWidget {
 
                                 ],
                               )
+
+
                           )
                         //)
-                      )]
+                      )
+                      */
+                    ]
+
                 )
             )
         ));}}
@@ -183,9 +231,11 @@ class ProductDetailView extends StatelessWidget {
 class PackageInfoDetail extends StatefulWidget {
   final String packageurl;
   final String type;
+  final PackageDetailDataResult packageDetail;
   const PackageInfoDetail({ super.key,
     required this.packageurl,
-    required this.type
+    required this.type,
+    required this.packageDetail
   });
 
   @override
@@ -194,14 +244,17 @@ class PackageInfoDetail extends StatefulWidget {
 }
 class _PackageInfoState extends State<PackageInfoDetail> {
 
+
   int selectedIndex = 0;
   int segmentedControlValue = 0;
+  int thinknowsegmentedValue = 0;
   int pricingSegmentedControlValue = 0;
   int inclusionsSegmentedControlValue = 0;
   int selectedInclusionIndex = 0;
   var selectedInclusionTab = "Inclusion";
   List<String> Inclusions = ["Inclusions", "Exclusions"];
-  int thinknowsegmentedValue = 0;
+
+
   @override
   Widget build(BuildContext context) {
     List<String> Infolist = ["OverView", "Tour detail", "Tour Informat"];
@@ -228,19 +281,19 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                   itemBuilder: (context, index) => buildCategory(index, Infolist),
                 ),
 
-                ),
+              ),
               // (height,width ,value)
               Container(
                   margin:  EdgeInsets.all(10),
                   child:  packageListViw(selectedIndex)),
-
-               SizedBox(height: 20),
+              SizedBox(height: 20),
               _segmentedControl(),
+
               SizedBox(height: 20),
               Container(
-                child: segmentedControlValue==0?_itinearyControl():
-                segmentedControlValue==1?_pricingControl():
-                segmentedControlValue==2?_batchesControl():_itinearyControl()
+                  child: segmentedControlValue==0?_itinearyControl(widget.packageDetail.itineraries![0].itineraryDayWise ?? []):
+                  segmentedControlValue==1?_pricingControl():
+                  segmentedControlValue==2?_batchesControl():_itinearyControl(widget.packageDetail.itineraries![0].itineraryDayWise ?? [])
               ),
               SizedBox(height: 20),
               _InclusionsSegmentedControl(),
@@ -249,22 +302,20 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                   inclusionsSegmentedControlValue==1?_cancellationControl():_inclusionControl()
               ),
               SizedBox(height: 20,),
+              SizedBox(height: 20),
+
+
               _thinkssegmentedControl(),
-              Container(
-                  child: thinknowsegmentedValue==0?ThinkknowPackageView():
-                  thinknowsegmentedValue==1?ThinkknowView():ThinkknowPackageView()
-              ),
+              SizedBox(height: 20),
 
+              if (thinknowsegmentedValue == 0) ThinkknowPackageView() else ThinkknowView(widget.packageDetail.thingsToPack ?? [])
 
+            ])
 
+    );
+  }
 
-
-             ])
-
-          );
-        }
-
-    Widget buildCategory(int index, List<String> value) {
+  Widget buildCategory(int index, List<String> value) {
 
     return InkWell(
       onTap: () {
@@ -301,33 +352,28 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         ),
       ),
     );
-   }
-   Widget packageListViw(int index ) {
+  }
+  Widget packageListViw(int index ) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return  Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Container(
 
+              child:  ReadMoreText(
 
-           Container(
-
-
-
-       child:  ReadMoreText(
-
-       " A Leh Ladakh bike trip is on top of the bucket list of many travelers. The reason is that Ladakh is renowned for being a biker's paradise. The ever-changing terrains, the thrill of offroading, and the contrasting landscape make it a dream destination. In the past few years, the popularity of Ladakh has increased tenfold. Travelers from all over the globe come to visit the Land of High passes for many different reasons but the topmost reason remains the same, a bike trip where they get to traverse      trimMode: TrimMode.Line",
-      trimLines: 2,
-      colorClickableText: Colors.blue,
-      trimCollapsedText: '--Read More',
-      // trimExpandedText: '',
-      moreStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-      )
-           )
+                " A Leh Ladakh bike trip is on top of the bucket list of many travelers. The reason is that Ladakh is renowned for being a biker's paradise. The ever-changing terrains, the thrill of offroading, and the contrasting landscape make it a dream destination. In the past few years, the popularity of Ladakh has increased tenfold. Travelers from all over the globe come to visit the Land of High passes for many different reasons but the topmost reason remains the same, a bike trip where they get to traverse      trimMode: TrimMode.Line",
+                trimLines: 2,
+                colorClickableText: Colors.blue,
+                trimCollapsedText: '--Read More',
+                // trimExpandedText: '',
+                moreStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              )
+          )
         ]
     );
-
   }
   Widget _segmentedControl() => Container(
     width: 500,
@@ -339,10 +385,10 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         0:Padding(
             padding: EdgeInsets.all(12.0),
             child: Text('Itinerary')),
-       // 0: Text('Itinerary'),
+        // 0: Text('Itinerary'),
         1: Padding(
-      padding: EdgeInsets.all(12.0),
-      child:  Text('Pricing')),
+            padding: EdgeInsets.all(12.0),
+            child:  Text('Pricing')),
 
         2: Padding(
             padding: EdgeInsets.all(12.0),
@@ -351,7 +397,6 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       onValueChanged: (int val) {
         setState(() {
           segmentedControlValue = val;
-
         });
       },
       groupValue: segmentedControlValue,
@@ -359,7 +404,10 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
-  Widget _itinearyControl() => Container(
+
+  //pradeep code
+
+  Widget _itinearyControl(List<ItineraryDayWise>?  itineraryDayWise) => Container(
     width: double.infinity,
 
     margin: EdgeInsets.all(10),
@@ -384,22 +432,22 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 250,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _itinearyListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _itinearyListControl(itineraryDayWise,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                ),
               ),
+
             ),
           ],
         ),
         SizedBox(height: 20,),
         Center(
           child: Text(
-              "View more", style: AppStyle.instance.bodyTooSemi.copyWith(
+              "View more", style: AppStyle.instance.bodySemi.copyWith(
             color: AppColors.appbarlinearColor,
           )),
         ),
@@ -407,42 +455,6 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       ],
     ),
 
-  );
-
-  Widget _itinearyListControl() => ListTile(
-    leading: Column(
-      children: [
-        Container(
-          decoration: new BoxDecoration(
-            color:AppColors.grayColor,
-            borderRadius: BorderRadius.all(Radius.circular(7)),
-
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(
-                  "1st", style: AppStyle.instance.bodySemi.copyWith(
-                color: AppColors.blackColor,
-              )),Text(
-                  "day", style: AppStyle.instance.bodyMedium.copyWith(
-                color: AppColors.blackColor,
-              )),
-            ],),
-          ),
-        ),
-      ],
-    ),
-    title: Text('Delhi to Manali | Overnight Journey',style: AppStyle.instance.bodyTooSemi.copyWith(
-    color: AppColors.blackColor,
-    )),
-    subtitle: Text('The group will assemble at the pick-up point by 7 PM (tentative) in the evening.'
-        ,style: AppStyle.instance.priceRegular.copyWith(
-          color: AppColors.blackColor,
-        )
-    ),
   );
 
   Widget _pricingControl() => Container(
@@ -477,29 +489,28 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 250,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _pricingListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _pricingListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                ),
               ),
+
             ),
           ],
         ):pricingSegmentedControlValue==1?Column(
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 250,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _pricingListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                ),
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _pricingListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
               ),
             ),
           ],
@@ -507,30 +518,30 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 250,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _pricingListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _pricingListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                ),
               ),
+
             ),
           ],
         ):Column(
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 290,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _pricingListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _pricingListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                ),
               ),
+
             ),
           ],
         ),
@@ -541,13 +552,80 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
+  Widget _itinearyListControl(List<ItineraryDayWise>?  itineraryDayWise,int index) => Column(
+     children: [
+       Row(
+         children: [
+           Container(
+             decoration: new BoxDecoration(
+               color:AppColors.grayColor,
+               borderRadius: BorderRadius.all(Radius.circular(7)),
+
+             ),
+             child: Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   Text(
+                       itineraryDayWise![index].dayNumber.toString()+"st", style: AppStyle.instance.bodySemi.copyWith(
+                     color: AppColors.blackColor,
+                   )),Text(
+                       "day", style: AppStyle.instance.bodyMedium.copyWith(
+                     color: AppColors.blackColor,
+                   )),
+                 ],),
+             ),
+           ),
+           SizedBox(width: 10,),
+           Expanded(
+             child: Text(itineraryDayWise![index].heading.toString(),style: AppStyle.instance.bodySemi.copyWith(
+               color: AppColors.blackColor,
+             )),
+           ),
+         ],
+       ),
+       SizedBox(height: 1,),
+       Html(data: itineraryDayWise![index].description.toString()),
+       itineraryDayWise[index].itineraryDayWiseImages!.isNotEmpty?Container(
+         height: 60,
+         child: ListView.separated(
+           scrollDirection: Axis.horizontal,
+           shrinkWrap: true,
+           physics: ScrollPhysics(),
+           itemBuilder: (BuildContext context, int indexI) {
+             return _itinearyImageListControl(itineraryDayWise[index].itineraryDayWiseImages,indexI);
+           }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+
+         ),
+
+       ):Container(),
+     ],
+  );
+  Widget _itinearyImageListControl(List<ItineraryDayWiseImages>?  itineraryDayWiseImages,int index) => Container(
+      height: 60,
+      width: 55,
+      decoration: new BoxDecoration(
+        color:Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+          image: DecorationImage(
+            // filterQuality: FilterQuality.low,
+              fit: BoxFit.cover,
+              image:
+              NetworkImage(Imagepath.categryPath.description + "packages/images/itineraries/Parashar_Lake_-_JustWravel_(49)-5-JustWravel.JPG"
+              ))
+      )
+
+  );
+
+  //Controller
   Widget _pricingSegmentedControl() => Container(
     width: double.infinity,
     height: 45,
     child: CupertinoSegmentedControl<int>(
       selectedColor: Colors.blue,
-      borderColor: AppColors.blueGroundColor,
-      unselectedColor: AppColors.blueGroundColor,
+      borderColor: AppColors.whiteColor,
+      unselectedColor: AppColors.whiteColor,
       children: {
         0:Padding(
             padding: EdgeInsets.all(12.0),
@@ -602,15 +680,17 @@ class _PackageInfoState extends State<PackageInfoDetail> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                height: 70,
-                child: Expanded(
-                  child: ListView.separated(
-                    itemBuilder: (BuildContext context, int index) {
-                      return _pricingSubListControl();
-                    }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                  ),
+
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return _pricingSubListControl();
+                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+
                 ),
+
               ),
             ],
           ),
@@ -666,15 +746,17 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: 300,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _batchesListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 3,
 
-                ),
+
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _batchesListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 3,
+
               ),
+
             ),
           ],
         ),
@@ -732,15 +814,16 @@ class _PackageInfoState extends State<PackageInfoDetail> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                height: 70,
-                child: Expanded(
-                  child: ListView.separated(
-                    itemBuilder: (BuildContext context, int index) {
-                      return _batchesSubListControl();
-                    }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-                  ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return _batchesSubListControl();
+                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+
                 ),
+
               ),
             ],
           ),
@@ -766,7 +849,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-                "Start Point : Delhi", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                "Start Point : Delhi", style: AppStyle.instance.bodyTooSemi.copyWith(
               color: AppColors.blackColor,
             )),
             SizedBox(height: 5,),
@@ -780,7 +863,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         Column(
           children: [
             Text(
-                "End Point : Delhi", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                "End Point : Delhi", style: AppStyle.instance.bodyTooSemi.copyWith(
               color: AppColors.blackColor,
             )),
             SizedBox(height: 5,),
@@ -853,22 +936,22 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
                 });
               },
-            child: Container(
-              margin: EdgeInsets.only(left: 10,top: 10),
-              width: 120,
-              alignment: AlignmentDirectional.center,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Inclusion", style: AppStyle.instance.bodyNormal.copyWith(
-                  color: selectedInclusionTab=="Inclusion"?AppColors.appbarlinearColor:AppColors.grayColor)),
-                  SizedBox(height: 10,),
-                  selectedInclusionTab=="Inclusion"?Divider(height: 2,color: selectedInclusionTab=="Inclusion"?AppColors.appbarlinearColor:AppColors.grayColor):Container()
-                ],
+              child: Container(
+                margin: EdgeInsets.only(left: 10,top: 10),
+                width: 120,
+                alignment: AlignmentDirectional.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text("Inclusion", style: AppStyle.instance.bodyNormal.copyWith(
+                        color: selectedInclusionTab=="Inclusion"?AppColors.appbarlinearColor:AppColors.grayColor)),
+                    SizedBox(height: 10,),
+                    selectedInclusionTab=="Inclusion"?Divider(height: 2,color: selectedInclusionTab=="Inclusion"?AppColors.appbarlinearColor:AppColors.grayColor):Container()
+                  ],
+                ),
               ),
             ),
-          ),
-          Spacer(),
+            Spacer(),
             GestureDetector(
               onTap: (){
                 setState(() {
@@ -877,25 +960,25 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 });
 
               },
-            child: Container(
-              margin: EdgeInsets.only(right: 10,top: 10),
-              width: 120,
-              alignment: AlignmentDirectional.center,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Excusions", style: AppStyle.instance.bodyNormal.copyWith(
-                      color: selectedInclusionTab=="Excusions"?AppColors.appbarlinearColor:AppColors.grayColor)),
-                  SizedBox(height: 10,),
-                  selectedInclusionTab=="Excusions"?Divider(height: 2,color: selectedInclusionTab=="Excusions"?AppColors.appbarlinearColor:AppColors.grayColor):Container(),
-            
-            
-                ],
+              child: Container(
+                margin: EdgeInsets.only(right: 10,top: 10),
+                width: 120,
+                alignment: AlignmentDirectional.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text("Excusions", style: AppStyle.instance.bodyNormal.copyWith(
+                        color: selectedInclusionTab=="Excusions"?AppColors.appbarlinearColor:AppColors.grayColor)),
+                    SizedBox(height: 10,),
+                    selectedInclusionTab=="Excusions"?Divider(height: 2,color: selectedInclusionTab=="Excusions"?AppColors.appbarlinearColor:AppColors.grayColor):Container(),
+
+
+                  ],
+                ),
               ),
             ),
-          ),
 
-        ],),
+          ],),
         SizedBox(height: 10,),
         Divider(height: 1,color: AppColors.grayColor,),
         // (height,width ,value)
@@ -904,15 +987,16 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 320,
-              child: Expanded(
-                child: ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return _inclusionsListControl();
-                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 6,
 
-                ),
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _inclusionsListControl();
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 6,
+
               ),
+
             ),
           ],
         ),
@@ -933,10 +1017,11 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image(image: AssetImage("assets/images/green_arrow.png"),width: 20,height: 20,),
+            SizedBox(width: 5),
             Expanded(
               child: Text(
                   maxLines: 5,
-                  "Transportation in Tempo Traveller from Manali to Manali", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                  "Transportation in Tempo Traveller from Manali to Manali", style: AppStyle.instance.bodyTooSemi.copyWith(
                 color: AppColors.blackColor,
               )),
             ),
@@ -971,7 +1056,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
         Center(
           child: Text(
-              "Coming Soon", style: AppStyle.instance.bodyTooSemi.copyWith(
+              "Coming Soon", style: AppStyle.instance.bodySemi.copyWith(
             color: AppColors.appbarlinearColor,
           )),
         ),
@@ -980,6 +1065,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
     ),
 
   );
+
 
 
   Widget _thinkssegmentedControl() => Container(
@@ -1006,140 +1092,150 @@ class _PackageInfoState extends State<PackageInfoDetail> {
     ),
 
   );
-  Widget ThinkknowPackageView() {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 1),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-
-                padding: EdgeInsets.all(10),
-                decoration: new BoxDecoration(
-                  color:Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-
-                ),
-                child: ListView.builder(
-
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemCount: 10,
-                    itemBuilder: (context, index) =>
-                        Container(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-
-                                  Row(
-                                    children: <Widget>[
-                                      Container(
-                                          margin: EdgeInsets.all(10),
-                                          child:
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            child: Image.asset(
-                                                "assets/images/Icon.png", width: 38.0,
-                                                height: 38.0,
-                                                fit: BoxFit.cover),
-                                          )),
-
-                                      Expanded(child:
-                                      Text("Floaters or Sandals:",
-                                          style: AppStyle.instance.bodySemi
-                                              .copyWith(
-                                            color: AppColors.blackColor,
-                                          )),
-                                        //SizedBox(height: 10),
-                                      ),
-                                    ],
-                                  ),
-                                  Text("When you are on a local sightseeing tour, you are required to carry only a few necessary items and for that, you need a day backpack as you will leave your bigger one at your designated stay.")
-                                ])
-                        )),
-              ),
-            ])
-
-    );
-  }
-  Widget ThinkknowView() {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 1),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-
-                padding: EdgeInsets.all(10),
-                decoration: new BoxDecoration(
-                  color:Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-
-                ),
-                child: ListView.builder(
-
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemCount:10,
-                    itemBuilder: (context, index) => Container(
-
-                        child:  Row(
-
-                          children: <Widget>[
-                            Container(
-                                margin: EdgeInsets.all(10),
-                                child:
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child:   Image.asset("assets/images/thinknow.png",width: 80.0,
-                                      height: 100.0,
-                                      fit: BoxFit.cover),
-                                )),
-
-                            Expanded(child:
-                            Column (
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text("Ancient Monastic Culture:",style: AppStyle.instance.bodySemi.copyWith(
-                                  color: AppColors.blackColor,
-                                )),
-                                //SizedBox(height: 10),
-                                ReadMoreText("Pangong Lake, a shimmering jewel amidst the arid landscapes, is known for its ever",
-                                  trimLines: 2,
-                                  colorClickableText: Colors.blue,
-                                  trimCollapsedText: '--Read More',
-                                  trimExpandedText: 'show',
-                                  moreStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                )
-
-                              ],
-
-
-                            ))
-
-
-                          ],
-                        )
-                    )),
-              ),
-            ])
-
-    );
-
-  }
-
-
 
 }
 
+
+
+
+Widget ThinkknowView(List<ThingsToPack> thinktopack) {
+  return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+
+              padding: EdgeInsets.all(10),
+              decoration: new BoxDecoration(
+                color:Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+
+              ),
+              child: ListView.builder(
+
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemCount: thinktopack.length,
+                  itemBuilder: (context, index) =>
+                      Container(
+
+                          child: Row(
+
+                            children: <Widget>[
+                              Container(
+                                  margin: EdgeInsets.all(10),
+                                  child:
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    child: Image.asset(
+                                        "assets/images/thinknow.png",
+                                        width: 80.0,
+                                        height: 100.0,
+                                        fit: BoxFit.cover),
+                                  )),
+
+                              Expanded(child:
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(thinktopack[index].title ?? "",
+                                      style: AppStyle.instance.bodySemi
+                                          .copyWith(
+                                        color: AppColors.blackColor,
+                                      )),
+                                  //SizedBox(height: 10),
+                                  ReadMoreText(
+                                    thinktopack[index].description ?? "",
+                                    trimLines: 2,
+                                    colorClickableText: Colors.blue,
+                                    trimCollapsedText: '--Read More',
+                                    trimExpandedText: 'show',
+                                    moreStyle: TextStyle(fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  )
+
+                                ],
+
+
+                              ))
+
+
+                            ],
+                          )
+                      )),
+            ),
+          ])
+
+  );
+}
+
+
+
+Widget ThinkknowPackageView() {
+  return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+
+              padding: EdgeInsets.all(10),
+              decoration: new BoxDecoration(
+                color:Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+
+              ),
+              child: ListView.builder(
+
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemCount: 10,
+                  itemBuilder: (context, index) =>
+                      Container(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+
+                                Row(
+                                  children: <Widget>[
+                                    Container(
+                                        margin: EdgeInsets.all(10),
+                                        child:
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(10.0),
+                                          child: Image.asset(
+                                              "assets/images/Icon.png", width: 38.0,
+                                              height: 38.0,
+                                              fit: BoxFit.cover),
+                                        )),
+
+                                    Expanded(child:
+                                    Text("Floaters or Sandals:",
+                                        style: AppStyle.instance.bodySemi
+                                            .copyWith(
+                                          color: AppColors.blackColor,
+                                        )),
+                                      //SizedBox(height: 10),
+                                    ),
+                                  ],
+                                ),
+                                Text("When you are on a local sightseeing tour, you are required to carry only a few necessary items and for that, you need a day backpack as you will leave your bigger one at your designated stay.")
+                              ])
+                      )),
+            ),
+          ])
+
+  );
+}
 class SimilarPackageListView extends StatefulWidget {
   const SimilarPackageListView({ super.key});
   @override
@@ -1193,8 +1289,6 @@ class _PopularListViewState extends State<SimilarPackageListView> {
                                   color: Colors.blue)),
                             )
 
-
-
                           ],
                         )),
                     Padding(padding: EdgeInsets.only(left: 10, right: 10, top: 15),
@@ -1226,11 +1320,13 @@ class _PopularListViewState extends State<SimilarPackageListView> {
           itemBuilder: (BuildContext context, int index){
             return BestSellerItem(dataItem: value.bestSellerList.data!.data!.dataResult![index]);
           },
-
         )
     );
   }
 }
+
+
+
 
 
 

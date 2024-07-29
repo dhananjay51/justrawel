@@ -58,7 +58,7 @@ dependencies:
   custom_sliding_segmented_control: ^1.8.3
   readmore: ^3.0.0
   percent_indicator: ^4.0.1
-
+  flutter_html:
 
 
 dev_dependencies:

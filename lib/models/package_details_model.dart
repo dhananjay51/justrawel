@@ -628,6 +628,7 @@ class Itineraries {
   int? status;
   String? createdAt;
   String? updatedAt;
+  List<ItineraryDayWise>? itineraryDayWise;
 
   StartingLocation? startingLocation;
   StartingLocation? endingLocation;
@@ -649,6 +650,7 @@ class Itineraries {
         this.status,
         this.createdAt,
         this.updatedAt,
+        this.itineraryDayWise,
 
         this.startingLocation,
         this.endingLocation});
@@ -670,6 +672,12 @@ class Itineraries {
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    if (json['itinerary_day_wise'] != null) {
+      itineraryDayWise = <ItineraryDayWise>[];
+      json['itinerary_day_wise'].forEach((v) {
+        itineraryDayWise!.add(new ItineraryDayWise.fromJson(v));
+      });
+    }
 
     startingLocation = json['starting_location'] != null
         ? new StartingLocation.fromJson(json['starting_location'])
@@ -697,7 +705,10 @@ class Itineraries {
     data['status'] = this.status;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-
+    if (this.itineraryDayWise != null) {
+      data['itinerary_day_wise'] =
+          this.itineraryDayWise!.map((v) => v.toJson()).toList();
+    }
     if (this.startingLocation != null) {
       data['starting_location'] = this.startingLocation!.toJson();
     }
@@ -707,6 +718,82 @@ class Itineraries {
     return data;
   }
 }
+
+class ItineraryDayWise {
+  int? id;
+  int? packageItineraryId;
+  int? dayNumber;
+  String? heading;
+  String? description;
+  int? breakfast;
+  int? lunch;
+  int? dinner;
+  String? stayType;
+  String? stayName;
+  String? createdAt;
+  String? updatedAt;
+  List<ItineraryDayWiseImages>? itineraryDayWiseImages;
+
+  ItineraryDayWise(
+      {this.id,
+        this.packageItineraryId,
+        this.dayNumber,
+        this.heading,
+        this.description,
+        this.breakfast,
+        this.lunch,
+        this.dinner,
+        this.stayType,
+        this.stayName,
+        this.createdAt,
+        this.updatedAt,
+        this.itineraryDayWiseImages});
+
+  ItineraryDayWise.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    packageItineraryId = json['package_itinerary_id'];
+    dayNumber = json['day_number'];
+    heading = json['heading'];
+    description = json['description'];
+    breakfast = json['breakfast'];
+    lunch = json['lunch'];
+    dinner = json['dinner'];
+    stayType = json['stay_type'];
+    stayName = json['stay_name'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+    if (json['itinerary_day_wise_images'] != null) {
+      itineraryDayWiseImages = <ItineraryDayWiseImages>[];
+      json['itinerary_day_wise_images'].forEach((v) {
+        itineraryDayWiseImages!.add(new ItineraryDayWiseImages.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['package_itinerary_id'] = this.packageItineraryId;
+    data['day_number'] = this.dayNumber;
+    data['heading'] = this.heading;
+    data['description'] = this.description;
+    data['breakfast'] = this.breakfast;
+    data['lunch'] = this.lunch;
+    data['dinner'] = this.dinner;
+    data['stay_type'] = this.stayType;
+    data['stay_name'] = this.stayName;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    if (this.itineraryDayWiseImages != null) {
+      data['itinerary_day_wise_images'] =
+          this.itineraryDayWiseImages!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+
+
 
 class StartingLocation {
   int? id;

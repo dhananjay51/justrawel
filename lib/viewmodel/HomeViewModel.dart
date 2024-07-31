@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:justwravel/View/HomeView/ProductDetail/package_list_view.dart';
 import 'package:justwravel/models/best_packing_model.dart';
@@ -84,6 +86,7 @@ class HomeViewViewModel with ChangeNotifier {
 
   setBackPackingCategory(ApiResponse<BackPackingCategory> response) {
     getBackPackingCategories = response;
+    print(getBackPackingCategories);
     notifyListeners();
   }
   setPackageDetail(ApiResponse<PackageDetail> response) {
@@ -182,6 +185,7 @@ class HomeViewViewModel with ChangeNotifier {
     await _homeRepo.getPackageDetail(url).then((value) {
       setPackageDetail(ApiResponse.completed(value));
     }).onError((error, stackTrace) =>
+
         setBackPackingCategory(ApiResponse.error(error.toString())));
     }
 

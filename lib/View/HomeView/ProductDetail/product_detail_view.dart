@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:justwravel/View/HomeView/carousel_slider.dart';
 import 'package:justwravel/data/network/AppUrl.dart';
 import '../../../models/up_coming_trips_model.dart';
@@ -295,8 +296,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               SizedBox(height: 20),
               Container(
                   child: segmentedControlValue==0?_itinearyControl(widget.packageDetail.itineraries![0].itineraryDayWise ?? []):
-                  segmentedControlValue==1?_pricingControl():
-                  segmentedControlValue==2?_batchesControl():_itinearyControl(widget.packageDetail.itineraries![0].itineraryDayWise ?? [])
+                  segmentedControlValue==1?_pricingControl(widget.packageDetail.prices ?? []):
+                  segmentedControlValue==2?_batchesControl(widget.packageDetail.batches ?? []):_itinearyControl(widget.packageDetail.itineraries![0].itineraryDayWise ?? [])
               ),
               SizedBox(height: 20),
               _InclusionsSegmentedControl(),
@@ -460,7 +461,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
-  Widget _pricingControl() => Container(
+  Widget _pricingControl(List<Prices>?  price) => Container(
     width: double.infinity,
 
     margin: EdgeInsets.all(10),
@@ -496,8 +497,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl();
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+                  return _pricingListControl(price,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
 
               ),
 
@@ -512,8 +513,9 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl();
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+                  //return _pricingListControl(price!.where((i) => i.occupancyId=="2").toList(),index);
+                  return _pricingListControl(price,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
               ),
             ),
           ],
@@ -525,8 +527,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl();
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+                  return _pricingListControl(price,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
 
               ),
 
@@ -540,8 +542,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl();
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+                  return _pricingListControl(price,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
 
               ),
 
@@ -654,7 +656,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
   );
 
 
-  Widget _pricingListControl() => Padding(
+  Widget _pricingListControl(List<Prices>?  price, int index) => Padding(
     padding: const EdgeInsets.only(left: 5,right: 5,top: 2,bottom: 2),
     child: Container(
       padding: EdgeInsets.all(10),
@@ -673,13 +675,35 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              "Own Bike", style: AppStyle.instance.bodyVerySmallBold.copyWith(
+              price![index].travelModeName.toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
             color: AppColors.blackColor,
           )),
           SizedBox(height: 10,),
           Divider(height: 1,color: AppColors.grayTextColor,),
           SizedBox(height: 10,),
-          Column(
+          Container(
+            padding: EdgeInsets.all(1),
+            decoration: new BoxDecoration(
+              color:Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    price![index].riderName.toString(), style: AppStyle.instance.bodyVerySmall.copyWith(
+                  color: AppColors.blackColor,
+                )),
+                Spacer(),
+                Text(
+                    "₹ "+price![index].price.toString(), style: AppStyle.instance.bodyVerySmall.copyWith(
+                  color: AppColors.blackColor,
+                )),
+
+              ],
+            ),
+          )
+          /*Column(
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
@@ -696,7 +720,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
               ),
             ],
-          ),
+          ),*/
         ],
       ),
     ),
@@ -724,7 +748,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
     ),
   );
 
-  Widget _batchesControl() => Container(
+  Widget _batchesControl(List<Batches>?  batches) => Container(
     width: double.infinity,
 
     margin: EdgeInsets.all(10),
@@ -755,8 +779,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _batchesListControl();
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 3,
+                  return _batchesListControl(batches,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: batches!.length,
 
               ),
 
@@ -771,7 +795,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
-  Widget _batchesListControl() => Padding(
+  Widget _batchesListControl(List<Batches>?  batches, int index) => Padding(
     padding: const EdgeInsets.only(left: 5,right: 5,top: 2,bottom: 2),
     child: Container(
       padding: EdgeInsets.all(10),
@@ -793,7 +817,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  "10-Sep To 30-Sep", style: AppStyle.instance.bodySemi.copyWith(
+                  formatDate(batches![index].startdate.toString())+" To "+formatDate(batches![index].lastdate.toString()), style: AppStyle.instance.bodySemi.copyWith(
                 color: AppColors.blackColor,
               )),
               LinearPercentIndicator(
@@ -803,7 +827,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 animation: true,
                 linearStrokeCap: LinearStrokeCap.roundAll,
                 barRadius: Radius.circular(10),
-                center: Text("only 5 left",style: AppStyle.instance.bodyLight10.copyWith(
+                center: Text("only "+batches[index].availability.toString()+" left",style: AppStyle.instance.bodyLight10.copyWith(
                   color: AppColors.whiteColor,
                 )),
                 backgroundColor: AppColors.lightOrangeGroundColor,
@@ -813,7 +837,56 @@ class _PackageInfoState extends State<PackageInfoDetail> {
             ],
           ),
           SizedBox(height: 10,),
-          Column(
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: new BoxDecoration(
+              border: Border.all(
+                  color: Colors.grey,
+                  width: 1.0,
+                  style: BorderStyle.solid
+              ),
+              color:Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                        "Start Point : Delhi", style: AppStyle.instance.bodyTooSemi.copyWith(
+                      color: AppColors.blackColor,
+                    )),
+                    SizedBox(height: 5,),
+                    Text(
+                        formatDateTime(batches[index].createdAt.toString()), style: AppStyle.instance.bodyLight.copyWith(
+                      color: AppColors.blackColor,
+                    )),
+                  ],
+                ),
+                Image(image: AssetImage("assets/images/right_arrow.png"),width: 30,height: 20,),
+                Column(
+                  children: [
+                    Text(
+                        "End Point : Delhi", style: AppStyle.instance.bodyTooSemi.copyWith(
+                      color: AppColors.blackColor,
+                    )),
+                    SizedBox(height: 5,),
+                    Text(
+                        formatDateTime(batches[index].updatedAt.toString()), style: AppStyle.instance.bodyLight.copyWith(
+                      color: AppColors.blackColor,
+                    )),
+                  ],
+                ),
+
+
+
+              ],
+            ),
+          )
+
+          /*Column(
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
@@ -829,11 +902,52 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
               ),
             ],
-          ),
+          ),*/
         ],
       ),
     ),
   );
+
+  String formatDate(String dateString) {
+    try {
+      // Parse the input date string into a DateTime object
+      DateTime dateTime = DateTime.parse(dateString);
+
+      // Extract the month abbreviation
+      String monthAbbreviation = DateFormat('MMM').format(dateTime);
+
+      // Construct the desired output with a fixed day (e.g., 10)
+      String formattedDate = '10-$monthAbbreviation';
+
+      return formattedDate;
+    } catch (e) {
+      // Handle any potential errors
+      print('Error parsing date: $e');
+      return 'Invalid Date';
+    }
+  }
+
+  String formatDateTime(String isoDateString) {
+    try {
+      // Parse the ISO 8601 date string into a DateTime object
+      DateTime dateTime = DateTime.parse(isoDateString).toLocal(); // Convert to local time
+
+      // Define the output formats
+      String dayMonthYear = DateFormat('ddMMM, yyyy').format(dateTime);
+      String time = DateFormat('h.mma').format(dateTime).toUpperCase();
+
+      // Construct the final formatted string
+      String formattedDate = '$dayMonthYear ($time)';
+
+      return formattedDate;
+    } catch (e) {
+      // Handle any potential errors
+      print('Error parsing date: $e');
+      return 'Invalid Date';
+    }
+  }
+
+
   Widget _batchesSubListControl() => Container(
     padding: EdgeInsets.all(10),
     decoration: new BoxDecoration(
@@ -1326,6 +1440,7 @@ class _PopularListViewState extends State<SimilarPackageListView> {
         )
     );
   }
+
 }
 
 

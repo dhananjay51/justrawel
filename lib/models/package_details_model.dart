@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class  PackageDetail{
   String? status;
   PackageDetailData? data;
@@ -233,8 +235,15 @@ class PackageDetailDataResult {
       });
     }
 
-    youtubeVideos = json['youtube_videos'].cast<String>();
-    instaIds = json['insta_ids'].cast<String>();
+    if(json['insta_ids'] != null){
+      instaIds = json['insta_ids'].cast<String>();
+
+    }
+
+    if(json['youtube_videos'] != null){
+      youtubeVideos = json['youtube_videos'].cast<String>();
+
+    }
 
     reviewCount = json['review_count'];
     rating = json['rating'];
@@ -427,7 +436,7 @@ class ItineraryDayWiseImages {
   String? filename;
   String? caption;
   Null? altText;
-  Null? description;
+  String? description;
   String? createdAt;
   String? updatedAt;
 
@@ -470,10 +479,10 @@ class BannerImage {
   int? id;
   int? packageId;
   String? image;
-  Null? caption;
+  String? caption;
   int? isMainBanner;
   String? mainBannerType;
-  Null? order;
+  int? order;
   String? createdAt;
   String? updatedAt;
 
@@ -521,7 +530,7 @@ class GalleryImage {
   String? image;
   String? caption;
   int? isMainBanner;
-  Null? mainBannerType;
+  String? mainBannerType;
   int? order;
   String? createdAt;
   String? updatedAt;
@@ -617,7 +626,7 @@ class Itineraries {
   int? startingLocationId;
   int? endingLocationId;
   String? reportingPlace;
-  Null? reportingTime;
+  String? reportingTime;
   int? duration;
   int? departureOption;
   String? departureTime;
@@ -802,11 +811,11 @@ class StartingLocation {
   String? name;
   Null? bannerImage;
   String? slug;
-  Null? description;
+  String? description;
   Null? tagLine;
-  Null? metaTitle;
-  Null? metaKeywords;
-  Null? metaDescription;
+  String? metaTitle;
+  String? metaKeywords;
+  String? metaDescription;
   int? status;
   String? createdAt;
   String? updatedAt;
@@ -1027,8 +1036,8 @@ class Prices {
   String? travelModeName;
   int? occupancyId;
   String? occupancyName;
-  Null? riderId;
-  Null? riderName;
+  int? riderId;
+  String? riderName;
   int? price;
   int? discountedPrice;
   int? id;
@@ -1049,7 +1058,10 @@ class Prices {
     travelModeName = json['travel_mode_name'];
     occupancyId = json['occupancy_id'];
     occupancyName = json['occupancy_name'];
-    riderId = json['rider_id'];
+    if(json['rider_id'] !=Null){
+      riderId = json['rider_id'];
+
+    }
     riderName = json['rider_name'];
     price = json['price'];
     discountedPrice = json['discounted_price'];

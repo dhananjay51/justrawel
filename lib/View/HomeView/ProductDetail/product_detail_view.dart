@@ -302,8 +302,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               SizedBox(height: 20),
               _InclusionsSegmentedControl(),
               Container(
-                  child: inclusionsSegmentedControlValue==0?_inclusionControl():
-                  inclusionsSegmentedControlValue==1?_cancellationControl():_inclusionControl()
+                  child: inclusionsSegmentedControlValue==0?_inclusionControl(widget.packageDetail.itineraries!):
+                  inclusionsSegmentedControlValue==1?_cancellationControl():_inclusionControl(widget.packageDetail.itineraries!)
               ),
               SizedBox(height: 20,),
               SizedBox(height: 20),
@@ -1029,7 +1029,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
-  Widget _inclusionControl() => Container(
+  Widget _inclusionControl(List<Itineraries>?  itineraries) => Container(
     width: double.infinity,
 
     margin: EdgeInsets.all(10),
@@ -1101,7 +1101,9 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         Divider(height: 1,color: AppColors.grayColor,),
         // (height,width ,value)
         SizedBox(height: 20,),
-        Column(
+        selectedInclusionTab=="Inclusion"?Html(data: itineraries![0].inclusions.toString(),
+           ):Html(data: itineraries![0].exclusions.toString(),),
+        /*Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -1117,7 +1119,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
             ),
           ],
-        ),
+        ),*/
 
 
       ],
@@ -1173,10 +1175,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
 
         Center(
-          child: Text(
-              "Coming Soon", style: AppStyle.instance.bodySemi.copyWith(
-            color: AppColors.appbarlinearColor,
-          )),
+          child: Html(data: widget.packageDetail.cancellationPolicy,
+              ),
         ),
 
       ],

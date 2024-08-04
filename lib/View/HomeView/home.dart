@@ -35,6 +35,19 @@ class _HomeState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
       body:  Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: <Color>[
+                AppColors.appbarlinearColor,
+                AppColors.backGroundColor,
+
+              ], // Gradient from https://learnui.design/tools/gradient-generator.html
+              tileMode: TileMode.mirror,
+            ),
+          ),
 
             child:SingleChildScrollView(
 
@@ -63,7 +76,7 @@ class _HomeState extends State {
 
                         margin: EdgeInsets.all(15),
                         height: 45,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                         child: TextField(
                           readOnly: true,
                           onTap: () {

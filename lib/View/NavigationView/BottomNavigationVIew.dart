@@ -40,8 +40,9 @@ class _BottomNavigationState extends State {
     return Scaffold(
 
         appBar: AppBar(
-
+          backgroundColor: AppColors.appbarlinearColor,
           flexibleSpace: Container(
+            margin: EdgeInsets.only(top: 40),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -53,11 +54,49 @@ class _BottomNavigationState extends State {
               ]),
 
             ),
+               child: Row(
+
+                 children: [
+                   SizedBox(width: 15,),
+                   Image.asset("assets/images/newlogo.png",width: 150,),
+                   Spacer(),
+                   IconButton(
+                       onPressed: (){
+                         /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
+                         //action coe when button is pressed
+                       },
+                       icon:  Container(
+
+                           width: 35,
+                           height: 35,
+
+                           //  borderRadius: BorderRadius.circular(23)),
+                           child:Image.asset("assets/images/phone_headar.png") //Icon(Icons.search, color: Colors.white),
+                       )),
+                   IconButton(
+                       onPressed: (){
+                         /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
+                         //action coe when button is pressed
+                       },
+                       icon:  Container(
+
+                           width: 35,
+                           height: 35,
+                        /*   decoration: BoxDecoration(
+                             color: Color(0xFFEDEDF1),
+                             shape: BoxShape.circle,
+                           ),*/
+                           //  borderRadius: BorderRadius.circular(23)),
+                           child:Image.asset("assets/images/menu.png") //Icon(Icons.search, color: Colors.white),
+                       )),
+                   SizedBox(width: 15,)
+                 ],
+               ),
           ),
 
         automaticallyImplyLeading: true,
 
-        actions: [
+       /* actions: [
           IconButton(
               onPressed: (){
                /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
@@ -90,23 +129,12 @@ class _BottomNavigationState extends State {
                   //  borderRadius: BorderRadius.circular(23)),
                   child:Image.asset("assets/images/search.png") //Icon(Icons.search, color: Colors.white),
               )),
-             ],
+             ],*/
 
-         leading: IconButton(
-             onPressed: (){
-              /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-               //action coe when button is pressed
-             },
-             icon:   Container(
-
-                 width: 45,
-                 height: 45,
-
-                 child: Image.asset("assets/images/Logo-2.png"),
-                  
-             ),
-
-             ),
+        /* leading: SizedBox(
+           width: 200,
+           child: Image.asset("assets/images/newlogo.png",width: 150,height: 100,),
+         ),*/
         ),
       body: _pages[_selectedTab],
       bottomNavigationBar: BottomNavigationBar(

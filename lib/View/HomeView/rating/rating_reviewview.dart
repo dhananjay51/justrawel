@@ -54,7 +54,7 @@ class _PopularListViewState extends State<RatingReviewView> {
                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                        children: [
 
-                    Expanded(child: _RatingView()),
+                      Expanded(child: _RatingView()),
                       SizedBox(width:10),
                      
                     Expanded(child: _ReViewView()),

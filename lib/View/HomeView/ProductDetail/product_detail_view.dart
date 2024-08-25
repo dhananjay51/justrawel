@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:justwravel/View/HomeView/carousel_slider.dart';
+import 'package:justwravel/View/onboard/LoginScreen.dart';
 import 'package:justwravel/data/network/AppUrl.dart';
 import '../../../models/up_coming_trips_model.dart';
 import '../../../res/color.dart';
@@ -33,26 +34,50 @@ import 'package:justwravel/View/HomeView/best_seller/best_seller_item.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_html/flutter_html.dart';
 
+import '../../NavigationView/CustomBottomSheet.dart';
+import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
+
 class ProductDetailView extends StatefulWidget {
  final String slug;
-  ProductDetailView({
-    super.key,
-     required this.slug
-  });
+  ProductDetailView({super.key, required this.slug});
   @override
   _ProductDetailViewState createState() => _ProductDetailViewState();
 }
 class _ProductDetailViewState extends State<ProductDetailView> {
   HomeViewViewModel homeViewViewModel = HomeViewViewModel();
-
+  bool _isLocked = false;
+  bool _isCollapsed = true;
+  bool _isExpanded = false;
+  int _listSize = 1;
+  final _bsbController = BottomSheetBarController();
   @override
   void initState() {
 
      print(AppUrl.PackageDetails + widget.slug);
     homeViewViewModel.fetchPackingDetail(AppUrl.PackageDetails + widget.slug);
-
+     _bsbController.addListener(_onBsbChanged);
     super.initState();
   }
+  @override
+  void dispose() {
+    _bsbController.removeListener(_onBsbChanged);
+    super.dispose();
+  }
+  void _onBsbChanged() {
+    if (_bsbController.isCollapsed && !_isCollapsed) {
+      setState(() {
+        _isCollapsed = true;
+        _isExpanded = false;
+      });
+    } else if (_bsbController.isExpanded && !_isExpanded) {
+      setState(() {
+        _isCollapsed = false;
+        _isExpanded = true;
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,138 +123,395 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           ),
         ),
+        body:  BottomSheetBar(
+          height: 100,
+          locked: _isLocked,
+          controller: _bsbController,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32.0),
+            topRight: Radius.circular(32.0),
+          ),
+          borderRadiusExpanded: const BorderRadius.only(
+            topLeft: Radius.circular(32.0),
+            topRight: Radius.circular(32.0),
+          ),
+          boxShadows: [
+            BoxShadow(
+              color: Colors.white,
+              spreadRadius: 5.0,
+              // blurRadius: 32.0,
+              offset: const Offset(0, 0),
+              // changes position of shadow
+            ),
+          ],
+          body: Container(
 
-        body:  Container(
 
-            child:SingleChildScrollView(
+              child:SingleChildScrollView(
 
-                child: Column(
-                  //crossAxisAlignment: ,
-                    children: <Widget>[
+                  child: Column(
+                    //crossAxisAlignment: ,
+                      children: <Widget>[
 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 1),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 1),
 
-                        child:   ChangeNotifierProvider<HomeViewViewModel>(
-                            create: (BuildContext context) => homeViewViewModel,
-                            child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
-                              switch (value.getPackageDetails.apiStatus) {
-                                case ApiStatus.LOADING:
-                                  return SizedBox(
-                                    height: 200,
-                                    child: const Center(child: CircularProgressIndicator()),
-                                  );
-                                case ApiStatus.ERROR:
-                                  return Text(value.getPackageDetails.toString());
+                          child:   ChangeNotifierProvider<HomeViewViewModel>(
+                              create: (BuildContext context) => homeViewViewModel,
+                              child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
+                                switch (value.getPackageDetails.apiStatus) {
+                                  case ApiStatus.LOADING:
+                                    return SizedBox(
+                                      height: 200,
+                                      child: const Center(child: CircularProgressIndicator()),
+                                    );
+                                  case ApiStatus.ERROR:
+                                    return Text(value.getPackageDetails.toString());
 
-                                case ApiStatus.COMPLETED:
-                                  return Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 30),
-                                        IntroScreen(),
-                                        SizedBox(height: 10),
-                                        Detaillist(),
-                                        Reviewitemslist(),
-                                        SizedBox(height: 30),
-                                        PackageInfoDetail(packageurl: "", type: "", packageDetail: value.getPackageDetails.data!.data!.data!.first),
-                                        SizedBox(height: 30),
-                                        SimilarPackageListView(),
-                                        //SizedBox(height: 30),
-                                        Center(
-                                          child: Text("Videos"),
-                                        ),
-                                        Center(
-                                          child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
-                                            color: AppColors.blackColor,
-                                          )),
-                                        ),
-                                        Memories(sendType:""),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Center(
+                                  case ApiStatus.COMPLETED:
+                                    return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(height: 30),
+                                          IntroScreen(),
+                                          SizedBox(height: 10),
+                                          Detaillist(),
+                                          Reviewitemslist(),
+                                          SizedBox(height: 30),
+                                          PackageInfoDetail(packageurl: "", type: "", packageDetail: value.getPackageDetails.data!.data!.data!.first),
+                                          SizedBox(height: 30),
+                                          SimilarPackageListView(),
+                                          //SizedBox(height: 30),
+                                          Center(
+                                            child: Text("Videos"),
+                                          ),
+                                          Center(
+                                            child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
+                                              color: AppColors.blackColor,
+                                            )),
+                                          ),
+                                          Memories(sendType:""),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Center(
 
-                                              child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
-                                                color: AppColors.blackColor,
-                                              )),
-                                            ),
-                                          ],
-                                        ),
+                                                child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
+                                                  color: AppColors.blackColor,
+                                                )),
+                                              ),
+                                            ],
+                                          ),
 
-                                        ClientView(),
+                                          ClientView(),
 
-                                      ]);
-                                default:
-                                  return const Text("Best seller default");
-                              }
-                            })
+                                        ]);
+                                  default:
+                                    return const Text("Best seller default");
+                                }
+                              })
+                          ),
                         ),
-                      ),
 
-                      /*
-                      Container(
-                          color: AppColors.backGroundColor,
-                          child: Padding(
-                              padding: const EdgeInsets.only(right: 10.0, left: 5.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  SizedBox(height: 30),
-
-                                  IntroScreen(),
-
-                                  SizedBox(height: 10),
-                                  Detaillist(),
-
-                                  Reviewitemslist(),
-
-                                  SizedBox(height: 30),
-
-                                  PackageInfoDetail(packageurl: "", type: ""),
-
-                                  SizedBox(height: 30),
-
-                                  Center(
-                                    child: Text("Videos"),
-                                  ),
-                                  Center(
-                                    child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
-                                      color: AppColors.blackColor,
-                                    )),
-                                  ),
-                                  Memories(sendType:""),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                        /*
+                          Container(
+                              color: AppColors.backGroundColor,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(right: 10.0, left: 5.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Center(
 
-                                        child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
+                                      SizedBox(height: 30),
+
+                                      IntroScreen(),
+
+                                      SizedBox(height: 10),
+                                      Detaillist(),
+
+                                      Reviewitemslist(),
+
+                                      SizedBox(height: 30),
+
+                                      PackageInfoDetail(packageurl: "", type: ""),
+
+                                      SizedBox(height: 30),
+
+                                      Center(
+                                        child: Text("Videos"),
+                                      ),
+                                      Center(
+                                        child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
                                           color: AppColors.blackColor,
                                         )),
                                       ),
+                                      Memories(sendType:""),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Center(
+
+                                            child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
+                                              color: AppColors.blackColor,
+                                            )),
+                                          ),
+                                        ],
+                                      ),
+
+                                      ClientView(),
+
+
+                                    ],
+                                  )
+
+
+                              )
+                            //)
+                          )
+                          */
+                      ]
+
+                  )
+              )
+          ),
+          expandedBuilder: (scrollController) {
+            final itemList =
+            List<int>.generate(_listSize, (index) => index + 1);
+
+            // Wrapping the returned widget with [Material] for tap effects
+            return Material(
+              color: Colors.white,
+              child: Wrap(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Image(image: AssetImage("assets/images/down_img.png"),width: 15,height: 15,),
+                              Text(
+                                  "Cost Breakup", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                                color: AppColors.blackColor,
+                              )),
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Container(
+                                    child:Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Amount", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  ),
+                                              Text(
+                                                  "₹53000.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  )
+
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Charges", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  ),
+                                              Text(
+                                                  "₹150.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  )
+
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "GST", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  ),
+                                              Text(
+                                                  "₹2400.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  )
+
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Discount", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  ),
+                                              Text(
+                                                  "-₹0.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  )
+
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "TCS (Tax collection at source)", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  ),
+                                              Text(
+                                                  "₹1200.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                                color: AppColors.txtColor,fontSize: 10,
+                                              )  )
+
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,),
+                                          Divider(height: 1,color: AppColors.txtColor,),
+                                          SizedBox(height: 10,),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  "Subtotal", style: AppStyle.instance.bodySmallBold.copyWith(
+                                                color: AppColors.blackColor,fontSize: 13,
+                                              )  ),
+                                              Text(
+                                                  "₹55000.00", style: AppStyle.instance.bodySmallBold.copyWith(
+                                                color: AppColors.blackColor,fontSize: 13,
+                                              )  )
+
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.backGroundColor,
+                                        borderRadius: BorderRadius.all(Radius.circular(15))
+                                    )
+
+
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          "Amount to Pay", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                        color: AppColors.grayColor,fontSize: 12,
+                                      )  ),
+                                      SizedBox(height: 5,),
+                                      Text(
+                                          "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
+                                        color: AppColors.blackColor,fontSize: 17,
+                                      )),
                                     ],
                                   ),
+                                  Spacer(flex: 1,),
+                                  Container(
 
-                                  ClientView(),
+                                      width: 80,
+                                      height: 40,
+                                      child: Center(
+                                        child: Text(
+                                            "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                                          color: AppColors.whiteColor,
+                                        )),
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: AppColors.appbarlinearColor,
+                                          borderRadius: BorderRadius.all(Radius.circular(50))
+                                      )
 
-
+                                  )
                                 ],
                               )
 
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+          collapsed: TextButton(
+            onPressed: () => _bsbController.expand(),
+            child: Container(
+              child: Column(
+                children: [
+                  Image(image: AssetImage("assets/images/up_img.png"),width: 20,height: 20,),
+                  Text(
+                      "Cost Breakup", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                    color: AppColors.blackColor,
+                  )),
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              "Amount to Pay", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                            color: AppColors.grayColor,fontSize: 12,
+                          )  ),
+                          SizedBox(height: 5,),
+                          Text(
+                              "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
+                            color: AppColors.blackColor,fontSize: 17,
+                          )),
+                        ],
+                      ),
+                      Spacer(flex: 1,),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
 
-                          )
-                        //)
+                        },
+                        child: Container(
+                            width: 80,
+                            height: 40,
+                            child: Center(
+                              child: Text(
+                                  "Book Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                                color: AppColors.whiteColor,
+                              )),
+                            ),
+                            decoration: BoxDecoration(
+                                color: AppColors.appbarlinearColor,
+                                borderRadius: BorderRadius.all(Radius.circular(50))
+                            )
+                        
+                        ),
                       )
-                      */
-                    ]
+                    ],
+                  )
 
-                )
-            )
-        ));}}
+                ],
+              ),
+            ),
+          ),
+
+        ),);}}
+
+
+
 
 
 class PackageInfoDetail extends StatefulWidget {
@@ -257,11 +539,16 @@ class _PackageInfoState extends State<PackageInfoDetail> {
   int selectedInclusionIndex = 0;
   var selectedInclusionTab = "Inclusion";
   List<String> Inclusions = ["Inclusions", "Exclusions"];
+  var isOpen ="false";
+  int _selectedIndex = -1;
+  bool isSwipeUp =false;
 
 
   @override
   Widget build(BuildContext context) {
     List<String> Infolist = ["OverView", "Tour detail", "Tour Informat"];
+    Size size = MediaQuery.of(context).size;
+
     final height = MediaQuery
         .of(context)
         .size
@@ -312,8 +599,26 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               _thinkssegmentedControl(),
               SizedBox(height: 20),
 
-              if (thinknowsegmentedValue == 0) ThinkknowPackageView() else ThinkknowView(widget.packageDetail.thingsToPack ?? [])
-
+              if (thinknowsegmentedValue == 0) ThinkknowPackageView() else ThinkknowView(widget.packageDetail.thingsToPack ?? []),
+              AnimatedPositioned(
+                  curve: Curves.decelerate,
+                  duration: const Duration(milliseconds: 400),
+                  top: !isSwipeUp? size.height *0.5:size.height * 0.8,
+                  child: GestureDetector(
+                      onPanEnd: (details) {
+                        print(details.velocity.pixelsPerSecond.dy.toString());
+                        print(details.velocity.pixelsPerSecond.dx.toString());
+                        if (details.velocity.pixelsPerSecond.dy > -100) {
+                          setState(() {
+                            isSwipeUp = true;
+                          });
+                        } else {
+                          setState(() {
+                            isSwipeUp = false;
+                          });
+                        }
+                      },
+                      child: CustomBottomSheet(isSwipeUp: isSwipeUp,)))
             ])
 
     );
@@ -823,21 +1128,29 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               LinearPercentIndicator(
                 width: 110.0,
                 lineHeight: 20.0,
-                percent: 0.8,
+                percent: batches[index].availability==0?0.99:batches[index].availability==1?0.8:batches[index].availability==2?0.7:0.0,
                 animation: true,
                 linearStrokeCap: LinearStrokeCap.roundAll,
                 barRadius: Radius.circular(10),
                 center: Text("only "+batches[index].availability.toString()+" left",style: AppStyle.instance.bodyLight10.copyWith(
                   color: AppColors.whiteColor,
                 )),
-                backgroundColor: AppColors.lightOrangeGroundColor,
-                progressColor: AppColors.musturedGroundColor,
+                backgroundColor: batches[index].availability==0?AppColors.lightRedGroundColor:batches[index].availability==1?AppColors.lightOrangeGroundColor:batches[index].availability==2?AppColors.lightGreenGroundColor:AppColors.lightOrangeGroundColor,
+                progressColor: batches[index].availability==0?AppColors.redColor:batches[index].availability==1?AppColors.musturedGroundColor:batches[index].availability==2?AppColors.greenGroundColor:AppColors.musturedGroundColor,
               ),
-              Image(image: AssetImage("assets/images/up_icon.png"),width: 20,height: 20,)
+              GestureDetector(
+                  onTap: (){
+                          setState(() {
+
+                            _selectedIndex = index;
+                          });
+
+                  },
+                  child: Image(image: AssetImage("assets/images/up_icon.png"),width: 20,height: 20,))
             ],
           ),
           SizedBox(height: 10,),
-          Container(
+          _selectedIndex == index?Container(
             padding: EdgeInsets.all(10),
             decoration: new BoxDecoration(
               border: Border.all(
@@ -885,7 +1198,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
               ],
             ),
-          )
+          ):Container()
 
           /*Column(
             mainAxisSize: MainAxisSize.max,

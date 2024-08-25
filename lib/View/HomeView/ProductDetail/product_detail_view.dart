@@ -423,21 +423,26 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                     ],
                                   ),
                                   Spacer(flex: 1,),
-                                  Container(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
 
-                                      width: 80,
-                                      height: 40,
-                                      child: Center(
-                                        child: Text(
-                                            "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                                          color: AppColors.whiteColor,
-                                        )),
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: AppColors.appbarlinearColor,
-                                          borderRadius: BorderRadius.all(Radius.circular(50))
-                                      )
+                                    },
+                                    child: Container(
+                                        width: 80,
+                                        height: 40,
+                                        child: Center(
+                                          child: Text(
+                                              "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                                            color: AppColors.whiteColor,
+                                          )),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: AppColors.appbarlinearColor,
+                                            borderRadius: BorderRadius.all(Radius.circular(50))
+                                        )
 
+                                    ),
                                   )
                                 ],
                               )

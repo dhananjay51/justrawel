@@ -79,7 +79,14 @@ class _LoginScreenState extends State<LoginScreen>{
                    child: Row(
                      children: <Widget>[
 
-                       Image(image: AssetImage("assets/images/Back_icon.png"),height: 30,width: 30,),
+                       GestureDetector(
+                           onTap: (){
+                             setState(() {
+                               isScreen=="Otp"?isScreen="Login":isScreen=="Register"?isScreen="Login":Navigator.pop(context,true);
+                             });
+
+                           },
+                           child: Container(child: Image(image: AssetImage("assets/images/Back_icon.png"),height: 30,width: 30,))),
                        Spacer(),
                        Image(image: AssetImage("assets/images/newlogo.png"),height: 30,),
                        Spacer(),
@@ -301,16 +308,15 @@ class _LoginScreenState extends State<LoginScreen>{
                    ),
                    Spacer(flex: 1,),
                    GestureDetector(
-                     onTap: (){
+                    /* onTap: (){
                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
-
-                     },
+                       },*/
                      child: Container(
                          width: 80,
                          height: 40,
                          child: Center(
                            child: Text(
-                               "Book Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                               "Continue", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
                              color: AppColors.whiteColor,
                            )),
                          ),

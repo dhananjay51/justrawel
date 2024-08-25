@@ -441,21 +441,42 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                 ],
                               ),
                               Spacer(flex: 1,),
-                              Container(
+                              GestureDetector(
+                                onTap: (){
 
-                                  width: 80,
-                                  height: 40,
-                                  child: Center(
-                                    child: Text(
-                                        "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                                      color: AppColors.whiteColor,
-                                    )),
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.appbarlinearColor,
-                                      borderRadius: BorderRadius.all(Radius.circular(50))
-                                  )
+                                  Razorpay razorpay = Razorpay();
+                                  var options = {
+                                    'key': 'rzp_live_ILgsfZCZoFIKMb',
+                                    'amount': 100,
+                                    'name': 'Acme Corp.',
+                                    'description': 'Fine T-Shirt',
+                                    'retry': {'enabled': true, 'max_count': 1},
+                                    'send_sms_hash': true,
+                                    'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+                                    'external': {
+                                      'wallets': ['paytm']
+                                    }
+                                  };
+                                  razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
+                                  razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
+                                  razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
+                                  razorpay.open(options);
+                                },
+                                child: Container(
+                                    width: 80,
+                                    height: 40,
+                                    child: Center(
+                                      child: Text(
+                                          "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                                        color: AppColors.whiteColor,
+                                      )),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: AppColors.appbarlinearColor,
+                                        borderRadius: BorderRadius.all(Radius.circular(50))
+                                    )
 
+                                ),
                               )
                             ],
                           )
@@ -859,7 +880,7 @@ showDataAlert(BuildContext context,) {
               Spacer(flex: 1,),
               GestureDetector(
                  onTap: (){
-
+                   Navigator.of(context, rootNavigator: true).pop();
                  },
                   child: Image(image: AssetImage("assets/images/close.png"),width: 20,height: 20,)),
             ],
@@ -1010,7 +1031,7 @@ giftCardAlert(BuildContext context,) {
               Spacer(flex: 1,),
               GestureDetector(
                   onTap: (){
-
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   child: Image(image: AssetImage("assets/images/close.png"),width: 20,height: 20,)
               ),

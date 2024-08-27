@@ -83,7 +83,7 @@ class CategoryListView extends StatefulWidget {
                 height: 70,
                 width: 70,
                 decoration:  BoxDecoration(
-                    color: Colors.red,
+                    color: Colors.white,
                     image: DecorationImage(
                       // filterQuality: FilterQuality.low,
                         fit: BoxFit.cover,

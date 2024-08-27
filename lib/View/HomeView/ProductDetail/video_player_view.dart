@@ -4,9 +4,8 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class VideoPlayer extends StatefulWidget {
 
-  final String id;
-
-  const VideoPlayer({
+   final String id;
+   const VideoPlayer({
     super.key,
 
     required this.id
@@ -74,10 +73,7 @@ class VideoPlayer extends StatefulWidget {
       SystemUiOverlay.top,
     ]);
     },
-
-
-
-       /// onExitFullScreen: () {
+      /// onExitFullScreen: () {
         // WidgetsFlutterBinding.ensureInitialized();
 
          /// SystemChrome.setPreferredOrientations(DeviceOrientation.values);
@@ -98,15 +94,10 @@ class VideoPlayer extends StatefulWidget {
                 Stack(
                   children: [
                     player,
-                     Positioned(
-                          left: 20,
-                           bottom: 64,
 
-                         child: Text("hello"))
                   ],
                 )
-
-            ],
+                ],
           ),
         );
     //);

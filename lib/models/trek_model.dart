@@ -50,7 +50,7 @@ class TreksData {
 class TrekDataResult {
   int? id;
   Category? category;
-  List<Image>? image;
+  List<TrekImage>? image;
   String? title;
   String? slug;
   int? duration;
@@ -93,9 +93,9 @@ class TrekDataResult {
         ? new Category.fromJson(json['category'])
         : null;
     if (json['image'] != null) {
-      image = <Image>[];
+      image = <TrekImage>[];
       json['image'].forEach((v) {
-        image!.add(new Image.fromJson(v));
+        image!.add(new TrekImage.fromJson(v));
       });
     }
     title = json['title'];
@@ -169,7 +169,7 @@ class Category {
   }
 }
 
-class Image {
+class TrekImage {
   int? id;
   int? packageId;
   String? image;
@@ -180,7 +180,7 @@ class Image {
   String? createdAt;
   String? updatedAt;
 
-  Image(
+  TrekImage(
       {this.id,
         this.packageId,
         this.image,
@@ -191,7 +191,7 @@ class Image {
         this.createdAt,
         this.updatedAt});
 
-  Image.fromJson(Map<String, dynamic> json) {
+  TrekImage.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     packageId = json['package_id'];
     image = json['image'];

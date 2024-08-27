@@ -42,7 +42,7 @@ class _HomeState extends State {
               end: Alignment.bottomCenter,
               colors: <Color>[
                 AppColors.appbarlinearColor,
-                AppColors.backGroundColor,
+                AppColors.whiteColor,
 
               ], // Gradient from https://learnui.design/tools/gradient-generator.html
               tileMode: TileMode.mirror,
@@ -140,7 +140,7 @@ class _HomeState extends State {
                     MemoriesSlider(),
                     //Memories(),
 
-                   ],
+                  ],
                 )
             )
         ));

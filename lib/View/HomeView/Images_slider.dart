@@ -108,14 +108,18 @@ class _MemoriesState extends State<MemoriesSlider> {
 
      var imgPath ;
 
-      for (var item in inputlist)  {
+     if (inputlist.length >= 5) {
 
-       if(item.mainBannerType == "video-support") {
-
-        imgPath =  Imagepath.VideoImgpath.description + item.image!;
-
+       for (var item in inputlist) {
+        if (item.mainBannerType == "video-support") {
+          imgPath = Imagepath.VideoImgpath.description + item.image!;
         }
+      }
+      return imgPath;
     }
-    return imgPath;
+     else {
+       return   "https://storage.googleapis.com/storage.justwravel.com/common/ads-banner/summer-sale-ads-banner-mobile.webp?v=1?v=1";
+
+     }
   }
 }

@@ -242,7 +242,7 @@ class BestTrekItem extends StatelessWidget {
   }
     Container _bestSellerPoster(double height, double width) {
 
-    String  urlPath  =    Imagepath.categorgridPath.description + dataItem.image![0].image!;
+   // String  urlPath  =    Imagepath.categorgridPath.description + (dataItem. status.lowercased() == "Performance".lowercased()  {![5].image ?? "");
     return    Container(
      // margin: const EdgeInsets.only(right: 5, left: 5),
       width: width,
@@ -252,28 +252,36 @@ class BestTrekItem extends StatelessWidget {
         image:  DecorationImage(
           fit: BoxFit.cover,
           image:
-          NetworkImage(urlPath),
+          NetworkImage(getCategoryList(dataItem.image!)),
 
         ),
       ),
-      /* NetworkImage("${AppUrl.photoBaseUrl}${dataItem.image?[0]}"))),*/
+     ///  NetworkImage("${AppUrl.photoBaseUrl}${dataItem.image?[0]}"),
     );
-  }
-  /*
-  String getCategoryList(List<BannerImage> inputlist) {
 
+
+  }
+
+  String getCategoryList(List<TrekImage> inputlist) {
     var imgPath ;
-
-    for (var item in inputlist)  {
-
-      if(item.mainBannerType == "video-support") {
-
-        imgPath =  Imagepath.VideoImgpath.description + item.image!;
-
+      if  (inputlist.length >= 5) {
+        for (var item in inputlist) {
+          if (item.mainBannerType == "category-mobile") {
+            print(item.image);
+            imgPath = Imagepath.categorgridPath.description + (item.image ??
+                "https://storage.googleapis.com/storage.justwravel.com/common/ads-banner/summer-sale-ads-banner-mobile.webp?v=1?v=1");
+          }
+        }
+        return  imgPath;
       }
-    }
-    return imgPath;
-  }
+      else {
 
-   */
+        return  "https://storage.googleapis.com/storage.justwravel.com/common/ads-banner/summer-sale-ads-banner-mobile.webp?v=1?v=1";
+        'https://storage.googleapis.com/storage.justwravel.com/common/ads-banner/summer-sale-ads-banner-mobile.webp?v=1?v=1';
+
+    }
+
+    }
+
+
 }

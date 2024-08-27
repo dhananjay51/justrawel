@@ -210,7 +210,7 @@ class CategoryGridItem extends StatelessWidget {
           ),
           fit: BoxFit.cover,
           image:
-          NetworkImage(Imagepath.categorgridPath.description + getCategoryList(dataItem.image!)),
+          NetworkImage(getCategoryList(dataItem.image!)),
 
         ),
       ),
@@ -222,13 +222,18 @@ class CategoryGridItem extends StatelessWidget {
 String getCategoryList(List<ImageResult> inputlist) {
 
   var imgPath ;
-  for (var item in inputlist)  {
 
-      if(item.mainBannerType == "category-mobile") {
+   if (inputlist.length >= 5) {
+     for (var item in inputlist) {
+       if (item.mainBannerType == "category-mobile") {
+         imgPath = Imagepath.categorgridPath.description + (item.image ?? "");
+       }
+     }
+      return imgPath;
+   }
+      else {
+       return  imgPath = "https://storage.googleapis.com/storage.justwravel.com/common/ads-banner/summer-sale-ads-banner-mobile.webp?v=1?v=1";
+       }
 
-        imgPath =  item.image;
-
-      }
-    }
-   return imgPath;
+   // return imgPath;
 }

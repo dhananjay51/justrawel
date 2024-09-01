@@ -14,5 +14,9 @@ class AppColors {
   static const Color backGroundColor = Color(0xFFF4F4F4);
   static const Color blueGroundColor = Color(0xFFEEF8FF);
   static const Color musturedGroundColor = Color(0xFFFFAF21);
+  static const Color greenGroundColor = Color(0xFF2C7806);
   static const Color lightOrangeGroundColor = Color(0xFFFFF7E8);
+  static const Color lightGreenGroundColor = Color(0xFFD8F8C7);
+  static const Color lightRedGroundColor = Color(0xFFF8C7CE);
+  static const Color txtColor = Color(0xFF717171);
 }

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:justwravel/View/HomeView/booking_details/BatchSelectionWidget.dart';
 import 'package:justwravel/View/HomeView/carousel_slider.dart';
 import 'package:justwravel/View/onboard/LoginScreen.dart';
 import 'package:justwravel/data/network/AppUrl.dart';
@@ -38,8 +39,10 @@ import '../../NavigationView/CustomBottomSheet.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 
 class ProductDetailView extends StatefulWidget {
- final String slug;
-  ProductDetailView({super.key, required this.slug});
+  final String slug;
+  final String price;
+  final String discounted_price;
+  ProductDetailView({super.key, required this.slug,required this.price,required this.discounted_price});
   @override
   _ProductDetailViewState createState() => _ProductDetailViewState();
 }
@@ -50,12 +53,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   bool _isExpanded = false;
   int _listSize = 1;
   final _bsbController = BottomSheetBarController();
+
   @override
   void initState() {
-
-     print(AppUrl.PackageDetails + widget.slug);
+    print(AppUrl.PackageDetails + widget.slug);
     homeViewViewModel.fetchPackingDetail(AppUrl.PackageDetails + widget.slug);
-     _bsbController.addListener(_onBsbChanged);
+    _bsbController.addListener(_onBsbChanged);
     super.initState();
   }
   @override
@@ -81,439 +84,244 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment(0.1, 0.1),
-                  colors: <Color>[
-                    Color(0xff2E4FA4),
-                    Color(0xff2E4FA4),
+      appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment(0.1, 0.1),
+                colors: <Color>[
+                  Color(0xff2E4FA4),
+                  Color(0xff2E4FA4),
 
-                  ]),
-
-            ),
-          ),
-
-          automaticallyImplyLeading: true,
-
-          leading: IconButton(
-            onPressed: (){
-              Navigator.of(context).pop();
-              /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
-              //action coe when button is pressed
-            },
-            icon:   Container(
-
-              width: 45,
-              height: 45,
-              decoration: BoxDecoration(
-                color: Colors.blueAccent.withOpacity(0.4),
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    image: AssetImage('assets/images/backbt.png'),
-                    fit: BoxFit.fill
-                ),
-              ),
-
-              // child: Image.asset("assets/images/backbt.png"),
-
-            ),
+                ]),
 
           ),
         ),
-        body:  BottomSheetBar(
-          height: 100,
-          locked: _isLocked,
-          controller: _bsbController,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(32.0),
-            topRight: Radius.circular(32.0),
-          ),
-          borderRadiusExpanded: const BorderRadius.only(
-            topLeft: Radius.circular(32.0),
-            topRight: Radius.circular(32.0),
-          ),
-          boxShadows: [
-            BoxShadow(
-              color: Colors.white,
-              spreadRadius: 5.0,
-              // blurRadius: 32.0,
-              offset: const Offset(0, 0),
-              // changes position of shadow
+
+        automaticallyImplyLeading: true,
+
+        leading: IconButton(
+          onPressed: (){
+            Navigator.of(context).pop();
+            /// Navigator.push(context, MaterialPageRoute(builder: (context)=> SearchScreen()));
+            //action coe when button is pressed
+          },
+          icon:   Container(
+
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: Colors.blueAccent.withOpacity(0.4),
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                  image: AssetImage('assets/images/backbt.png'),
+                  fit: BoxFit.fill
+              ),
             ),
-          ],
-          body: Container(
 
+            // child: Image.asset("assets/images/backbt.png"),
 
-              child:SingleChildScrollView(
-
-                  child: Column(
-                    //crossAxisAlignment: ,
-                      children: <Widget>[
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 1),
-
-                          child:   ChangeNotifierProvider<HomeViewViewModel>(
-                              create: (BuildContext context) => homeViewViewModel,
-                              child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
-                                switch (value.getPackageDetails.apiStatus) {
-                                  case ApiStatus.LOADING:
-                                    return SizedBox(
-                                      height: 200,
-                                      child: const Center(child: CircularProgressIndicator()),
-                                    );
-                                  case ApiStatus.ERROR:
-                                    return Text(value.getPackageDetails.toString());
-
-                                  case ApiStatus.COMPLETED:
-                                    return Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 30),
-                                          IntroScreen(),
-                                          SizedBox(height: 10),
-                                          Detaillist(),
-                                          Reviewitemslist(),
-                                          SizedBox(height: 30),
-                                          PackageInfoDetail(packageurl: "", type: "", packageDetail: value.getPackageDetails.data!.data!.data!.first),
-                                          SizedBox(height: 30),
-                                          SimilarPackageListView(),
-                                          //SizedBox(height: 30),
-                                          Center(
-                                            child: Text("Videos"),
-                                          ),
-                                          Center(
-                                            child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
-                                              color: AppColors.blackColor,
-                                            )),
-                                          ),
-                                          Memories(sendType:""),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Center(
-
-                                                child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
-                                                  color: AppColors.blackColor,
-                                                )),
-                                              ),
-                                            ],
-                                          ),
-
-                                          ClientView(),
-
-                                        ]);
-                                  default:
-                                    return const Text("Best seller default");
-                                }
-                              })
-                          ),
-                        ),
-
-                        /*
-                          Container(
-                              color: AppColors.backGroundColor,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(right: 10.0, left: 5.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-
-                                      SizedBox(height: 30),
-
-                                      IntroScreen(),
-
-                                      SizedBox(height: 10),
-                                      Detaillist(),
-
-                                      Reviewitemslist(),
-
-                                      SizedBox(height: 30),
-
-                                      PackageInfoDetail(packageurl: "", type: ""),
-
-                                      SizedBox(height: 30),
-
-                                      Center(
-                                        child: Text("Videos"),
-                                      ),
-                                      Center(
-                                        child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
-                                          color: AppColors.blackColor,
-                                        )),
-                                      ),
-                                      Memories(sendType:""),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Center(
-
-                                            child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
-                                              color: AppColors.blackColor,
-                                            )),
-                                          ),
-                                        ],
-                                      ),
-
-                                      ClientView(),
-
-
-                                    ],
-                                  )
-
-
-                              )
-                            //)
-                          )
-                          */
-                      ]
-
-                  )
-              )
           ),
-          expandedBuilder: (scrollController) {
-            final itemList =
-            List<int>.generate(_listSize, (index) => index + 1);
 
-            // Wrapping the returned widget with [Material] for tap effects
-            return Material(
-              color: Colors.white,
-              child: Wrap(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          child: Column(
-                            children: [
-                              Image(image: AssetImage("assets/images/down_img.png"),width: 15,height: 15,),
-                              Text(
-                                  "Cost Breakup", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                                color: AppColors.blackColor,
-                              )),
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Container(
-                                    child:Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "Amount", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  ),
-                                              Text(
-                                                  "₹53000.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  )
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "Charges", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  ),
-                                              Text(
-                                                  "₹150.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  )
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "GST", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  ),
-                                              Text(
-                                                  "₹2400.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  )
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "Discount", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  ),
-                                              Text(
-                                                  "-₹0.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  )
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "TCS (Tax collection at source)", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  ),
-                                              Text(
-                                                  "₹1200.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                                color: AppColors.txtColor,fontSize: 10,
-                                              )  )
-
-                                            ],
-                                          ),
-                                          SizedBox(height: 10,),
-                                          Divider(height: 1,color: AppColors.txtColor,),
-                                          SizedBox(height: 10,),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "Subtotal", style: AppStyle.instance.bodySmallBold.copyWith(
-                                                color: AppColors.blackColor,fontSize: 13,
-                                              )  ),
-                                              Text(
-                                                  "₹55000.00", style: AppStyle.instance.bodySmallBold.copyWith(
-                                                color: AppColors.blackColor,fontSize: 13,
-                                              )  )
-
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: AppColors.backGroundColor,
-                                        borderRadius: BorderRadius.all(Radius.circular(15))
-                                    )
-
-
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          "Amount to Pay", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                                        color: AppColors.grayColor,fontSize: 12,
-                                      )  ),
-                                      SizedBox(height: 5,),
-                                      Text(
-                                          "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
-                                        color: AppColors.blackColor,fontSize: 17,
-                                      )),
-                                    ],
-                                  ),
-                                  Spacer(flex: 1,),
-                                  GestureDetector(
-                                    onTap: (){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
-
-                                    },
-                                    child: Container(
-                                        width: 80,
-                                        height: 40,
-                                        child: Center(
-                                          child: Text(
-                                              "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                                            color: AppColors.whiteColor,
+        ),
+      ),
+      body:  BottomSheetBar(
+        height: 100,
+        locked: _isLocked,
+        controller: _bsbController,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(32.0),
+          topRight: Radius.circular(32.0),
+        ),
+        borderRadiusExpanded: const BorderRadius.only(
+          topLeft: Radius.circular(32.0),
+          topRight: Radius.circular(32.0),
+        ),
+        boxShadows: [
+          BoxShadow(
+            color: Colors.white,
+            spreadRadius: 5.0,
+            // blurRadius: 32.0,
+            offset: const Offset(0, 0),
+            // changes position of shadow
+          ),
+        ],
+        body: Container(
+            child:SingleChildScrollView(
+                child: Column(
+                  //crossAxisAlignment: ,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 1),
+                        child:   ChangeNotifierProvider<HomeViewViewModel>(
+                            create: (BuildContext context) => homeViewViewModel,
+                            child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
+                              switch (value.getPackageDetails.apiStatus) {
+                                case ApiStatus.LOADING:
+                                  return SizedBox(
+                                    height: 200,
+                                    child: const Center(child: CircularProgressIndicator()),
+                                  );
+                                case ApiStatus.ERROR:
+                                  return Text(value.getPackageDetails.toString());
+                                case ApiStatus.COMPLETED:
+                                  return Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 30),
+                                        IntroScreen(),
+                                        SizedBox(height: 10),
+                                        Detaillist(),
+                                        Reviewitemslist(),
+                                        SizedBox(height: 30),
+                                        PackageInfoDetail(packageurl: "", type: "", packageDetail: value.getPackageDetails.data!.data!.data!.first),
+                                        SizedBox(height: 30),
+                                        SimilarPackageListView(),
+                                        //SizedBox(height: 30),
+                                        Center(
+                                          child: Text("Videos"),
+                                        ),
+                                        Center(
+                                          child: Text("Memories For Life", style: AppStyle.instance.bodySemi.copyWith(
+                                            color: AppColors.blackColor,
                                           )),
                                         ),
-                                        decoration: BoxDecoration(
-                                            color: AppColors.appbarlinearColor,
-                                            borderRadius: BorderRadius.all(Radius.circular(50))
-                                        )
+                                        Memories(sendType:""),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Center(
 
-                                    ),
-                                  )
-                                ],
-                              )
+                                              child: Text("What Our Clients Say About Us", style: AppStyle.instance.bodySemi.copyWith(
+                                                color: AppColors.blackColor,
+                                              )),
+                                            ),
+                                          ],
+                                        ),
 
-                            ],
-                          ),
+                                        ClientView(),
+
+                                      ]);
+                                default:
+                                  return const Text("Best seller default");
+                              }
+                            })
                         ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            );
-          },
-          collapsed: TextButton(
-            onPressed: () => _bsbController.expand(),
-            child: Container(
-              child: Column(
-                children: [
-                  Image(image: AssetImage("assets/images/up_img.png"),width: 20,height: 20,),
-                  Text(
-                      "Cost Breakup", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                    color: AppColors.blackColor,
-                  )),
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              "Amount to Pay", style: AppStyle.instance.bodyToo1Semi.copyWith(
-                            color: AppColors.grayColor,fontSize: 12,
-                          )  ),
-                          SizedBox(height: 5,),
-                          Text(
-                              "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
-                            color: AppColors.blackColor,fontSize: 17,
-                          )),
-                        ],
                       ),
-                      Spacer(flex: 1,),
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
 
-                        },
-                        child: Container(
-                            width: 80,
-                            height: 40,
-                            child: Center(
-                              child: Text(
-                                  "Book Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                                color: AppColors.whiteColor,
-                              )),
+
+                    ]
+
+                )
+            )
+        ),
+        expandedBuilder: (scrollController) {
+          final itemList =
+          List<int>.generate(_listSize, (index) => index + 1);
+
+          // Wrapping the returned widget with [Material] for tap effects
+          return Material(
+            color: Colors.white,
+
+          );
+        },
+        collapsed: TextButton(
+          onPressed: () => "",
+          child: Container(
+            child:ChangeNotifierProvider<HomeViewViewModel>(
+                create: (BuildContext context) => homeViewViewModel,
+                child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
+                  switch (value.getPackageDetails.apiStatus) {
+                    case ApiStatus.LOADING:
+                      return SizedBox(
+                        height: 200,
+                        //child: const Center(child: CircularProgressIndicator()),
+                      );
+                    case ApiStatus.ERROR:
+                      return Text(value.getPackageDetails.toString());
+                    case ApiStatus.COMPLETED:
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center, // Vertically centers the row inside the column
+                        children: [
+                          Center( // Horizontally centers the row
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Keeps space between elements inside the row
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Start From",
+                                      style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                        color: AppColors.grayColor,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      "₹" + widget.price,
+                                      style: AppStyle.instance.bodySmallBold.copyWith(
+                                        color: AppColors.blackColor,
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Spacer(flex: 1),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => BatchSelectionWidget(packageDetail: value.getPackageDetails.data!.data!.data!.first,)),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 50,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center, // Centers the texts vertically
+                                      crossAxisAlignment: CrossAxisAlignment.center, // Centers the texts horizontally
+                                      children: [
+                                        Text(
+                                          "Book Now",
+                                          style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                            fontSize: 12,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          "at ₹ 5,000",
+                                          style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                            fontSize: 8,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.appbarlinearColor,
+                                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            decoration: BoxDecoration(
-                                color: AppColors.appbarlinearColor,
-                                borderRadius: BorderRadius.all(Radius.circular(50))
-                            )
-                        
-                        ),
-                      )
-                    ],
-                  )
-
-                ],
-              ),
+                          ),
+                        ],
+                      );
+                    default:
+                      return const Text("Best seller default");
+                  }
+                })
             ),
-          ),
 
-        ),);}}
+
+
+          ),
+        ),
+
+      ),);}}
 
 
 
@@ -533,6 +341,8 @@ class PackageInfoDetail extends StatefulWidget {
   _PackageInfoState createState() => _PackageInfoState();
 
 }
+
+
 class _PackageInfoState extends State<PackageInfoDetail> {
 
 
@@ -547,11 +357,68 @@ class _PackageInfoState extends State<PackageInfoDetail> {
   var isOpen ="false";
   int _selectedIndex = -1;
   bool isSwipeUp =false;
+  List<String> numbers = [];
+  List<Prices>?  priceoccupancyType = [] ;
+  List<Prices>?  filterPriceoccupancyType = [] ;
+  var occupancyType = "";
+  int selectedOption = 0; // 0 for "Double", 1 for "Triple"
+  List<Map<String, dynamic>> finalList = [];
+  List<String> riderNames=[];
+  List<String> riderPrice=[];
+  @override
+  void initState() {
+    widget.packageDetail.prices!.forEach((item) {
+      addUniqueValue(numbers,item.occupancyName.toString());
+    });
 
+    setState(() {
+      priceoccupancyType = widget.packageDetail.prices!.where((occupancy) {
+        return occupancy.occupancyName!.contains(numbers[0].toString());
+      }).toList();
+// Grouping by travel_mode_id
+      Map<int, Map<String, dynamic>> groupedByTravelMode = {};
+      for (var price in priceoccupancyType!) {
+        int? travelModeId = price.travelModeId;
+        String? travelModeName = price.travelModeName;
+        String? riderName = price.riderName;
+
+        // If travel_mode_id is already present, update its rider_names and prices
+        if (groupedByTravelMode.containsKey(travelModeId)) {
+          if (riderName != null && !groupedByTravelMode[travelModeId]!['rider_names'].contains(riderName)) {
+            groupedByTravelMode[travelModeId]!['rider_names'].add(riderName);
+          }
+        } else {
+          // If not present, create a new entry for the travel_mode_id
+          groupedByTravelMode[travelModeId!!] = {
+            'travel_mode_id': travelModeId,
+            'travel_mode_name': travelModeName,
+            'rider_names': riderName != null ? [riderName] : [price.occupancyName],
+            'prices': []
+          };
+        }
+        // Adding price details with occupancy information
+        groupedByTravelMode[travelModeId]!['prices'].add({
+          'occupancy_name': price.occupancyName,
+          'price': price.price
+        });
+      }
+      // Convert map back to a list for easy use in Flutter
+      finalList = groupedByTravelMode.values.toList();
+    });
+    super.initState();
+  }
+
+  void addUniqueValue(List<String> list, String value) {
+    if (!list.contains(value)) {
+      list.add(value);
+    }
+    print(numbers)
+    ;
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> Infolist = ["OverView", "Tour detail", "Tour Informat"];
+    List<String> Infolist = ["OverView", "Tour detail", "Tour In format"];
     Size size = MediaQuery.of(context).size;
 
     final height = MediaQuery
@@ -605,7 +472,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               SizedBox(height: 20),
 
               if (thinknowsegmentedValue == 0) ThinkknowPackageView() else ThinkknowView(widget.packageDetail.thingsToPack ?? []),
-              AnimatedPositioned(
+              /*AnimatedPositioned(
                   curve: Curves.decelerate,
                   duration: const Duration(milliseconds: 400),
                   top: !isSwipeUp? size.height *0.5:size.height * 0.8,
@@ -623,7 +490,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                           });
                         }
                       },
-                      child: CustomBottomSheet(isSwipeUp: isSwipeUp,)))
+                      child: CustomBottomSheet(isSwipeUp: isSwipeUp,)))*/
             ])
 
     );
@@ -797,9 +664,104 @@ class _PackageInfoState extends State<PackageInfoDetail> {
           color: AppColors.blackColor,
         )),
         SizedBox(height: 10,),
+        // PricingType(packageurl: "", type: "", packageDetail: widget.packageDetail.prices!.toList()),
+        // Horizontal ListView inside Column
+        SizedBox(
+          height: 50, // Give the ListView a height
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: numbers.length, // Number of items
+            itemBuilder: (context, index) {
+              bool isSelected = selectedOption == index;
+              return GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      selectedOption = index; // Update the selected month
+                      priceoccupancyType = widget.packageDetail.prices!.where((occupancy) {
+                        return occupancy.occupancyName!.contains(numbers![index].toString());
+                      }).toList();
+
+                      // Grouping by travel_mode_id
+                      Map<int, Map<String, dynamic>> groupedByTravelMode = {};
+                      for (var price in priceoccupancyType!) {
+                        int? travelModeId = price.travelModeId;
+                        String? travelModeName = price.travelModeName;
+                        String? riderName = price.riderName;
+                        int? riderPrice = price.price;
+
+                        // If travel_mode_id is already present, update its rider_names and prices
+                        if (groupedByTravelMode.containsKey(travelModeId)) {
+                          if (riderName != null && !groupedByTravelMode[travelModeId]!['rider_names'].contains(riderName)) {
+                            groupedByTravelMode[travelModeId]!['rider_names'].add(riderName);
+                          }
+                        } else {
+                          // If not present, create a new entry for the travel_mode_id
+                          groupedByTravelMode[travelModeId!!] = {
+                            'travel_mode_id': travelModeId,
+                            'travel_mode_name': travelModeName,
+                            'rider_names': riderName != null ? [riderName] : [price.occupancyName],
+                            'prices':  [],
+                          };
+                        }
+
+                        // Adding price details with occupancy information
+                        groupedByTravelMode[travelModeId]!['prices'].add({
+                          'occupancy_name': price.occupancyName,
+                          'price': price.price
+                        });
+                      }
+
+                      // Convert map back to a list for easy use in Flutter
+                      finalList = groupedByTravelMode.values.toList();
+                      // Print the result
+                      finalList.forEach((entry) {
+                        print(entry);
+
+                      });
+
+
+                    });
+
+                  },
+                  child: Container(
+                    height: 40,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(),
+                      color: Colors.transparent,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(2),
+                      child: DecoratedBox(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              numbers![index].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+                                color: isSelected  ? Colors.white : Colors.blue,fontSize: 11
+                            ),
+
+                            ),
+                          ),
+                        ),
+                        decoration: ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          color: isSelected  ? Colors.blue : Colors.blue[100],
+                        ),
+                      ),
+                    ),
+                  )
+
+              );
+            },
+          ),
+        ),
+/*
         _pricingSegmentedControl(),
+*/
         SizedBox(height: 10,),
-        pricingSegmentedControlValue==0?Column(
+        Column(
           mainAxisSize: MainAxisSize.max,
           children: [
             Container(
@@ -807,53 +769,8 @@ class _PackageInfoState extends State<PackageInfoDetail> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl(price,index);
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
-
-              ),
-
-            ),
-          ],
-        ):pricingSegmentedControlValue==1?Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  //return _pricingListControl(price!.where((i) => i.occupancyId=="2").toList(),index);
-                  return _pricingListControl(price,index);
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
-              ),
-            ),
-          ],
-        ):pricingSegmentedControlValue==2?Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl(price,index);
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
-
-              ),
-
-            ),
-          ],
-        ):Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return _pricingListControl(price,index);
-                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: price!.length,
+                  return _pricingListControl(finalList,index);
+                }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: finalList!.length,
 
               ),
 
@@ -867,62 +784,132 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
+/*
+  Widget _pricingSegmentedUniqueControl(List<String>?  price, int index) => Container(
+
+       height: 40,
+      decoration: new BoxDecoration(
+        color:AppColors.appbarlinearColor,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+
+      ),
+    child: GestureDetector(
+      onTap: (){
+        setState(() {
+          priceoccupancyType = widget.packageDetail.prices!.where((occupancy) {
+            return occupancy.occupancyName!.contains(price![index].toString());
+          }).toList();
+          print(priceoccupancyType);
+        });
+      },
+      child: Text(
+          price![index].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+        color: AppColors.blackColor,
+      ),
+
+      ),
+    ),
+    margin: EdgeInsets.only(right: 10),
+
+  );
+*/
+  Widget _pricingSegmentedUniqueControl(List<String>?  price, int index) => GestureDetector(
+    onTap: (){
+      setState(() {
+        priceoccupancyType = widget.packageDetail.prices!.where((occupancy) {
+          return occupancy.occupancyName!.contains(price![index].toString());
+        }).toList();
+
+      });
+    },
+
+    child: Container(
+      height: 40,
+      decoration: ShapeDecoration(
+        shape: RoundedRectangleBorder(),
+        color: Colors.transparent,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(2),
+        child: DecoratedBox(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                price![index].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+                  color: AppColors.whiteColor,fontSize: 11
+              ),
+
+              ),
+            ),
+          ),
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            color: Colors.blue,
+          ),
+        ),
+      ),
+    ),
+  );
+
   Widget _itinearyListControl(List<ItineraryDayWise>?  itineraryDayWise,int index) => Column(
-     children: [
-       Row(
-         children: [
-           Container(
-             decoration: new BoxDecoration(
-               color:AppColors.grayColor,
-               borderRadius: BorderRadius.all(Radius.circular(7)),
+    children: [
+      Row(
+        children: [
+          Container(
+            decoration: new BoxDecoration(
+              color:AppColors.grayColor,
+              borderRadius: BorderRadius.all(Radius.circular(7)),
 
-             ),
-             child: Padding(
-               padding: const EdgeInsets.all(8.0),
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   Text(
-                       itineraryDayWise![index].dayNumber.toString()+"st", style: AppStyle.instance.bodySemi.copyWith(
-                     color: AppColors.blackColor,
-                   )),Text(
-                       "day", style: AppStyle.instance.bodyMedium.copyWith(
-                     color: AppColors.blackColor,
-                   )),
-                 ],),
-             ),
-           ),
-           SizedBox(width: 10,),
-           Expanded(
-             child: Text(itineraryDayWise![index].heading.toString(),style: AppStyle.instance.bodySemi.copyWith(
-               color: AppColors.blackColor,
-             )),
-           ),
-         ],
-       ),
-       SizedBox(height: 1,),
-       Html(data: itineraryDayWise![index].description.toString()),
-       itineraryDayWise[index].itineraryDayWiseImages!.isNotEmpty?Container(
-         height: 60,
-         child: ListView.separated(
-           scrollDirection: Axis.horizontal,
-           shrinkWrap: true,
-           physics: ScrollPhysics(),
-           itemBuilder: (BuildContext context, int indexI) {
-             return _itinearyImageListControl(itineraryDayWise[index].itineraryDayWiseImages,indexI);
-           }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      itineraryDayWise![index].dayNumber.toString()+"st", style: AppStyle.instance.bodySemi.copyWith(
+                    color: AppColors.blackColor,
+                  )),Text(
+                      "day", style: AppStyle.instance.bodyMedium.copyWith(
+                    color: AppColors.blackColor,
+                  )),
+                ],),
+            ),
+          ),
+          SizedBox(width: 10,),
+          Expanded(
+            child: Text(itineraryDayWise![index].heading.toString(),style: AppStyle.instance.bodySemi.copyWith(
+              color: AppColors.blackColor,
+            )),
+          ),
+        ],
+      ),
+      SizedBox(height: 1,),
+      Html(data: itineraryDayWise![index].description.toString()),
+      itineraryDayWise[index].itineraryDayWiseImages!.isNotEmpty?Container(
+        height: 60,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          physics: ScrollPhysics(),
+          itemBuilder: (BuildContext context, int indexI) {
+            return _itinearyImageListControl(itineraryDayWise[index].itineraryDayWiseImages,indexI);
+          }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
 
-         ),
+        ),
 
-       ):Container(),
-     ],
+      ):Container(),
+    ],
   );
   Widget _itinearyImageListControl(List<ItineraryDayWiseImages>?  itineraryDayWiseImages,int index) => Container(
       height: 60,
       width: 55,
       decoration: new BoxDecoration(
-        color:Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+          color:Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
           image: DecorationImage(
             // filterQuality: FilterQuality.low,
               fit: BoxFit.cover,
@@ -965,8 +952,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
   );
 
-
-  Widget _pricingListControl(List<Prices>?  price, int index) => Padding(
+  Widget _pricingListControl(List<Map<String, dynamic>>  price, int index) => Padding(
     padding: const EdgeInsets.only(left: 5,right: 5,top: 2,bottom: 2),
     child: Container(
       padding: EdgeInsets.all(10),
@@ -984,8 +970,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-              price![index].travelModeName.toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+          Text(price![index]["travel_mode_name"].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
             color: AppColors.blackColor,
           )),
           SizedBox(height: 10,),
@@ -997,20 +982,33 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               color:Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    price![index].riderName.toString(), style: AppStyle.instance.bodyVerySmall.copyWith(
-                  color: AppColors.blackColor,
-                )),
-                Spacer(),
-                Text(
-                    "₹ "+price![index].price.toString(), style: AppStyle.instance.bodyVerySmall.copyWith(
-                  color: AppColors.blackColor,
-                )),
-
-              ],
+              children: List.generate(price![index]['rider_names'].length, (riderIndex) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        price![index]['rider_names'][riderIndex],
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        '₹ ${price![index]['prices'][riderIndex]["price"].toString()}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                          /*decoration: price![index]['prices'][riderIndex]["price"] < 45000
+                              ? null
+                              : TextDecoration.lineThrough,*/
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ),
           )
           /*Column(
@@ -1035,6 +1033,33 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       ),
     ),
   );
+
+  Widget _pricingRiderListControl(List<String>  rider, int index) => Padding(
+    padding: const EdgeInsets.only(left: 5,right: 5,top: 2,bottom: 2),
+    child: Container(
+      padding: EdgeInsets.all(1),
+      decoration: new BoxDecoration(
+        color:Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              rider.toString(), style: AppStyle.instance.bodyVerySmall.copyWith(
+            color: AppColors.blackColor,
+          )),
+          Spacer(),
+          /*Text(
+                    "₹ "+price[index], style: AppStyle.instance.bodyVerySmall.copyWith(
+                  color: AppColors.blackColor,
+                )),*/
+
+        ],
+      ),
+    ),
+  );
+
   Widget _pricingSubListControl() => Container(
     padding: EdgeInsets.all(1),
     decoration: new BoxDecoration(
@@ -1145,10 +1170,9 @@ class _PackageInfoState extends State<PackageInfoDetail> {
               ),
               GestureDetector(
                   onTap: (){
-                          setState(() {
-
-                            _selectedIndex = index;
-                          });
+                    setState(() {
+                      _selectedIndex = index;
+                    });
 
                   },
                   child: Image(image: AssetImage("assets/images/up_icon.png"),width: 20,height: 20,))
@@ -1233,10 +1257,10 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       DateTime dateTime = DateTime.parse(dateString);
 
       // Extract the month abbreviation
-      String monthAbbreviation = DateFormat('MMM').format(dateTime);
+      String monthAbbreviation = DateFormat('d-MMM').format(dateTime);
 
       // Construct the desired output with a fixed day (e.g., 10)
-      String formattedDate = '10-$monthAbbreviation';
+      String formattedDate = monthAbbreviation;
 
       return formattedDate;
     } catch (e) {
@@ -1420,7 +1444,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
         // (height,width ,value)
         SizedBox(height: 20,),
         selectedInclusionTab=="Inclusion"?Html(data: itineraries![0].inclusions.toString(),
-           ):Html(data: itineraries![0].exclusions.toString(),),
+        ):Html(data: itineraries![0].exclusions.toString(),),
         /*Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1494,7 +1518,7 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
         Center(
           child: Html(data: widget.packageDetail.cancellationPolicy,
-              ),
+          ),
         ),
 
       ],
@@ -1531,7 +1555,68 @@ class _PackageInfoState extends State<PackageInfoDetail> {
 
 }
 
+class PricingType extends StatefulWidget{
+  final String packageurl;
+  final String type;
+  final List<Prices?> packageDetail;
+  const PricingType({ super.key,
+    required this.packageurl,
+    required this.type,
+    required this.packageDetail
+  });
+  @override
+  _PricingTypeState createState() => _PricingTypeState();
+}
 
+class _PricingTypeState extends State<PricingType>{
+  List<String> numbers = [];
+
+  @override
+  void initState() {
+    widget.packageDetail!.forEach((item) {
+      addUniqueValue(numbers,item!.occupancyName.toString());
+    });
+    super.initState();
+  }
+
+  void addUniqueValue(List<String> list, String value) {
+    if (!list.contains(value)) {
+      list.add(value);
+    }
+    print(numbers)
+    ;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      // crossAxisAlignment: CrossAxisAlignment.start,
+      // mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: numbers.length,
+                itemBuilder: (_, index) => _pricingSegmentedUniqueControl(numbers,index),
+              ),
+            ),
+
+          )]);
+  }
+
+  Widget _pricingSegmentedUniqueControl(List<String>?  price, int index) => Container(
+    width: double.infinity,
+    height: 45,
+    child: Text(
+        price![index].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+      color: AppColors.blackColor,
+    )),
+
+  );
+
+}
 
 
 Widget ThinkknowView(List<ThingsToPack> thinktopack) {
@@ -1761,6 +1846,42 @@ class _PopularListViewState extends State<SimilarPackageListView> {
   }
 
 }
+
+class PricingTypelist extends StatelessWidget {
+  List<String> numbers = [];
+  PricingTypelist({ super.key,
+    required this.numbers,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return  Row(
+        children: <Widget>[
+          Expanded(
+              child: SizedBox(
+                  height: 74.0,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return _pricingSegmentedUniqueControl(numbers,index);
+                    }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: numbers!.length,
+
+                  )
+              ))]);;
+  }
+  Widget _pricingSegmentedUniqueControl(List<String>?  price, int index) => Container(
+    width: double.infinity,
+    height: 45,
+    child: Text(
+        price![index].toString(), style: AppStyle.instance.bodyVerySmallBold.copyWith(
+      color: AppColors.blackColor,
+    )),
+
+  );
+}
+
 
 
 

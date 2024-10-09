@@ -30,16 +30,13 @@ class _PopularListViewState extends State<PackingListView> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
     return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ChangeNotifierProvider<HomeViewViewModel>(
-
               create: (BuildContext context) => homeViewViewModel,
               child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
-
                 switch (value.bestPackingList.apiStatus) {
                   case ApiStatus.LOADING:
                     return SizedBox(

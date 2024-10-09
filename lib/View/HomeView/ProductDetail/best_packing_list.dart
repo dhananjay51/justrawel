@@ -146,7 +146,7 @@ class BackPackageList extends StatelessWidget {
 
                                   //Sorting(),
 
-                                 // packageType == AppUrl.customDomestiPackage || packageType == AppUrl.customInternationalPackage ?   CustomPackage(packageurl: url, type: packageType) :  ProItems(packageurl: url, type: packageType),
+                                  // packageType == AppUrl.customDomestiPackage || packageType == AppUrl.customInternationalPackage ?   CustomPackage(packageurl: url, type: packageType) :  ProItems(packageurl: url, type: packageType),
                                   ProItems(packageurl: url, type: packageType),
 
                                   Touriustlist(),
@@ -211,11 +211,11 @@ class _ProItemsState extends State<ProItems> {
   @override
   void initState() {
     print(AppUrl.backpackingtripsCategory);
-   homeViewViewModel.fetchBackPackingCategories(AppUrl.backpackingtripsCategory);
+    homeViewViewModel.fetchBackPackingCategories(AppUrl.backpackingtripsCategory);
 
-     print(AppUrl.viewallPackagebackpacking);
+    print(AppUrl.viewallPackagebackpacking);
     homeViewViewModel.fetchFiltetCategotyApi(AppUrl.viewallPackagebackpacking
-    + "sort[field]=is_recommended&filter[states]=15&filter[countries]=&filter[month]=&filter[is_international]=0&page=1");
+        + "sort[field]=is_recommended&filter[states]=15&filter[countries]=&filter[month]=&filter[is_international]=0&page=1");
 
     super.initState();
   }
@@ -332,11 +332,11 @@ class _ProItemsState extends State<ProItems> {
           var category =   value[index]  ?? "";
           if  ( category == "All") {
 
-           // homeViewViewModel.fetchViewAllPackageApi(widget.packageurl);
+            // homeViewViewModel.fetchViewAllPackageApi(widget.packageurl);
           }
           else {
 
-           // homeViewViewModel.fetchViewAllPackageApi(widget.packageurl + "?page=1&filter[state_slug]=" + category);
+            // homeViewViewModel.fetchViewAllPackageApi(widget.packageurl + "?page=1&filter[state_slug]=" + category);
           }
           super.initState();
         });
@@ -413,160 +413,160 @@ class _ProItemsState extends State<ProItems> {
 
     return  ListView.builder(
 
-            itemCount: value.getPackageViewAllList.data?.data?.data?.length,
-            shrinkWrap: true,
-            physics: ScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                  onTap: () {
+        itemCount: value.getPackageViewAllList.data?.data?.data?.length,
+        shrinkWrap: true,
+        physics: ScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+              onTap: () {
 
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "",price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.price.toString() ?? "",discounted_price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.discountedPrice.toString() ?? "")));
               },
               child:  Card(
-                    color: Colors.white,
-                    elevation: 16,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Stack(alignment: Alignment.topLeft, children: [
-                            Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                ),
-                                color: Colors.white,
+                  color: Colors.white,
+                  elevation: 16,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(alignment: Alignment.topLeft, children: [
+                          Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
                               ),
+                              color: Colors.redAccent,
                             ),
-                            Positioned(
-                                top: 20,
-                                left: 0,
+                          ),
+                          Positioned(
+                              top: 20,
+                              left: 0,
 
-                                child:
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                    ),
-                                    color: Colors.green,
+                              child:
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
                                   ),
-                                  // color: Colors.greenAccent
-                                  height: 25,
-                                  child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
-                                    color: AppColors.blackColor,
-                                  )),
+                                  color: Colors.green,
+                                ),
+                                // color: Colors.greenAccent
+                                height: 25,
+                                child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
+                                  color: AppColors.blackColor,
+                                )),
 
-                                )
-                            ),
-
-                          ],
-
+                              )
                           ),
 
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                            child: Triplist(),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
+                        ],
 
-                              child: Column(
+                        ),
 
-                                  children: [
-                                    Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                          child: Triplist(),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 10, right:10),
 
-                                        children: [
-                                          Expanded (
-                                              child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
-                                                color: AppColors.blackColor,
-                                              ))),
-                                          Container(
-                                            padding: const EdgeInsets.all(5.0),
-                                            // color: Colors.blue,
-                                            decoration: BoxDecoration(
+                            child: Column(
 
-                                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                                              color: Colors.blue,
-                                            ),
-                                            child: Column(children: [
-                                              Text("Save upto"),
-                                              Text("₹ 2500")
-                                            ]),
-                                          )
-
-                                        ]),
-                                    Row(
-
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                                       children: [
-
-                                        Expanded(child:
-                                        Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
-
-                                      ],),
-                                  ])
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
-
-                              child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                  children: [
-
-                                    Expanded(child:
-                                    Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
-                                    Container(
-                                      padding: const EdgeInsets.all(10.0),
-
-                                      child: Column(children: [
-
-                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
-                                            style: AppStyle.instance.bodySmallBold.copyWith(
+                                        Expanded (
+                                            child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
                                               color: AppColors.blackColor,
+                                            ))),
+                                        Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          // color: Colors.blue,
+                                          decoration: BoxDecoration(
 
-                                            )),
-
-                                        if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
-                                          Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
-                                              color: AppColors.blackColor,
-                                              decoration: TextDecoration.lineThrough))
+                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                            color: Colors.blue,
+                                          ),
+                                          child: Column(children: [
+                                            Text("Save upto"),
+                                            Text("₹ 2500")
+                                          ]),
+                                        )
 
                                       ]),
-                                    )
+                                  Row(
 
-                                  ])),
-                          Padding(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+
+                                    children: [
+
+                                      Expanded(child:
+                                      Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
+
+                                    ],),
+                                ])
+                        ),
+                        SizedBox(height:10),
+                        Padding(
                             padding: const EdgeInsets.only(left: 10, right:10),
-                            child: Divider(
-                              color: Colors.grey,
-                              height: 1,
-                            ),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
-                            child: Menulist(),
-                          ),
-                        ])));
 
-            });
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                children: [
+
+                                  Expanded(child:
+                                  Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
+                                  Container(
+                                    padding: const EdgeInsets.all(10.0),
+
+                                    child: Column(children: [
+
+                                      Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
+                                          style: AppStyle.instance.bodySmallBold.copyWith(
+                                            color: AppColors.blackColor,
+
+                                          )),
+
+                                      if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
+                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
+                                            color: AppColors.blackColor,
+                                            decoration: TextDecoration.lineThrough))
+
+                                    ]),
+                                  )
+
+                                ])),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right:10),
+                          child: Divider(
+                            color: Colors.grey,
+                            height: 1,
+                          ),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
+                          child: Menulist(),
+                        ),
+                      ])));
+
+        });
   }
 
   String getImage(List<ViewAllPackageImage> inputlist) {
@@ -749,161 +749,161 @@ class _CustomPackagItemsState extends State<CustomPackage> {
   }
   Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
 
-      return  ListView.builder(
-            itemCount: value.getPackageViewAllList.data?.data?.data?.length,
-            shrinkWrap: true,
-            physics: ScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                  onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+    return  ListView.builder(
+        itemCount: value.getPackageViewAllList.data?.data?.data?.length,
+        shrinkWrap: true,
+        physics: ScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "",price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.price.toString() ?? "",discounted_price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.discountedPrice.toString() ?? "")));
               },
               child:  Card(
-                    color: Colors.white,
-                    elevation: 16,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Stack(alignment: Alignment.topLeft, children: [
-                            Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                ),
-                                color: Colors.redAccent,
+                  color: Colors.white,
+                  elevation: 16,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(alignment: Alignment.topLeft, children: [
+                          Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
                               ),
+                              color: Colors.redAccent,
                             ),
-                            Positioned(
-                                top: 20,
-                                left: 0,
+                          ),
+                          Positioned(
+                              top: 20,
+                              left: 0,
 
-                                child:
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                    ),
-                                    color: Colors.green,
+                              child:
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
                                   ),
-                                  // color: Colors.greenAccent
+                                  color: Colors.green,
+                                ),
+                                // color: Colors.greenAccent
 
-                                  height: 25,
-                                  child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
-                                    color: AppColors.blackColor,
-                                  )),
+                                height: 25,
+                                child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
+                                  color: AppColors.blackColor,
+                                )),
 
-                                )
-                            ),
-
-                          ],
-
+                              )
                           ),
 
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                            child: Triplist(),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
+                        ],
 
-                              child: Column(
+                        ),
 
-                                  children: [
-                                    Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                          child: Triplist(),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 10, right:10),
 
-                                        children: [
-                                          Expanded (
-                                              child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
-                                                color: AppColors.blackColor,
-                                              ))),
-                                          Container(
-                                            padding: const EdgeInsets.all(5.0),
-                                            // color: Colors.blue,
-                                            decoration: BoxDecoration(
+                            child: Column(
 
-                                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                                              color: Colors.blue,
-                                            ),
-                                            child: Column(children: [
-                                              Text("Save upto"),
-                                              Text("₹ 2500")
-                                            ]),
-                                          )
-
-                                        ]),
-                                    Row(
-
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                                       children: [
-
-                                        Expanded(child:
-                                        Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
-
-                                      ],),
-                                  ])
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
-
-                              child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                  children: [
-
-                                    Expanded(child:
-                                    Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
-                                    Container(
-                                      padding: const EdgeInsets.all(10.0),
-
-                                      child: Column(children: [
-
-                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
-                                            style: AppStyle.instance.bodySmallBold.copyWith(
+                                        Expanded (
+                                            child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
                                               color: AppColors.blackColor,
+                                            ))),
+                                        Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          // color: Colors.blue,
+                                          decoration: BoxDecoration(
 
-                                            )),
-
-                                        if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
-                                          Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
-                                              color: AppColors.blackColor,
-                                              decoration: TextDecoration.lineThrough))
+                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                            color: Colors.blue,
+                                          ),
+                                          child: Column(children: [
+                                            Text("Save upto"),
+                                            Text("₹ 2500")
+                                          ]),
+                                        )
 
                                       ]),
-                                    )
+                                  Row(
 
-                                  ])),
-                          Padding(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+
+                                    children: [
+
+                                      Expanded(child:
+                                      Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
+
+                                    ],),
+                                ])
+                        ),
+                        SizedBox(height:10),
+                        Padding(
                             padding: const EdgeInsets.only(left: 10, right:10),
-                            child: Divider(
-                              color: Colors.grey,
-                              height: 1,
-                            ),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
-                            child: Menulist(),
-                          ),
-                        ])));
 
-            });
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                children: [
+
+                                  Expanded(child:
+                                  Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
+                                  Container(
+                                    padding: const EdgeInsets.all(10.0),
+
+                                    child: Column(children: [
+
+                                      Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
+                                          style: AppStyle.instance.bodySmallBold.copyWith(
+                                            color: AppColors.blackColor,
+
+                                          )),
+
+                                      if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
+                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
+                                            color: AppColors.blackColor,
+                                            decoration: TextDecoration.lineThrough))
+
+                                    ]),
+                                  )
+
+                                ])),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right:10),
+                          child: Divider(
+                            color: Colors.grey,
+                            height: 1,
+                          ),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
+                          child: Menulist(),
+                        ),
+                      ])));
+
+        });
   }
 
   String getImage(List<ViewAllPackageImage> inputlist) {

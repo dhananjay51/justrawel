@@ -27,8 +27,8 @@ import 'package:justwravel/models/custom_package_model.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 
 class PackageList extends StatelessWidget {
-final String url;
-final String packageType;
+  final String url;
+  final String packageType;
 
   const PackageList({
     super.key,
@@ -147,7 +147,7 @@ final String packageType;
 
                                   //Sorting(),
 
-                                   packageType == AppUrl.customDomestiPackage || packageType == AppUrl.customInternationalPackage ?   CustomPackage(packageurl: url, type: packageType) :  ProItems(packageurl: url, type: packageType),
+                                  packageType == AppUrl.customDomestiPackage || packageType == AppUrl.customInternationalPackage ?   CustomPackage(packageurl: url, type: packageType) :  ProItems(packageurl: url, type: packageType),
                                   //ProItems(packageurl: url, type: packageType),
 
                                   Touriustlist(),
@@ -194,11 +194,11 @@ final String packageType;
 
 
 class ProItems extends StatefulWidget {
-   final String packageurl;
-   final String type;
+  final String packageurl;
+  final String type;
   const ProItems({ super.key,
-      required this.packageurl,
-     required this.type
+    required this.packageurl,
+    required this.type
   });
   @override
   State<ProItems> createState() => _ProItemsState();
@@ -216,165 +216,165 @@ class _ProItemsState extends State<ProItems> {
 
     homeViewViewModel.fetchFiltetCategotyApi(AppUrl.categoryVaiFilter  + widget.type);
 
-     super.initState();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {
 
     List<FilterCategoryData> all = [
       FilterCategoryData(
-       id: 0,
+        id: 0,
         value: "All",
         slug:  "All",
       )];
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     // TODO: implement build
-      return Column(
-          children:[
+    return Column(
+        children:[
 
-            Padding(
-          padding: const EdgeInsets.symmetric(vertical: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1),
 
-              child:   ChangeNotifierProvider<HomeViewViewModel>(
-                  create: (BuildContext context) => homeViewViewModel,
-                  child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
+            child:   ChangeNotifierProvider<HomeViewViewModel>(
+                create: (BuildContext context) => homeViewViewModel,
+                child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
 
-                    List<FilterCategoryData> result =   all +   value.getFiltetCategoryList.data!.data!;
+                  List<FilterCategoryData> result =   all +   value.getFiltetCategoryList.data!.data!;
 
-                    switch (value.getFiltetCategoryList.apiStatus) {
-                      case ApiStatus.LOADING:
-                        return SizedBox(
-                          height: height,
-                          child: const Center(child: CircularProgressIndicator()),
-                        );
-                      case ApiStatus.ERROR:
-                        return Text(value.getFiltetCategoryList.toString());
-                      case ApiStatus.COMPLETED:
-                        return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                               SizedBox(
-                                height: 35,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:  result.length,
-                                  itemBuilder: (context, index) => buildCategory(index, result),
-                                ),
-
+                  switch (value.getFiltetCategoryList.apiStatus) {
+                    case ApiStatus.LOADING:
+                      return SizedBox(
+                        height: height,
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    case ApiStatus.ERROR:
+                      return Text(value.getFiltetCategoryList.toString());
+                    case ApiStatus.COMPLETED:
+                      return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 35,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount:  result.length,
+                                itemBuilder: (context, index) => buildCategory(index, result),
                               ),
-                              // (height,width ,value),
-                            ]);
-                       default:
-                        return const Text("Best seller default");
-                    }
-                  })
+
+                            ),
+                            // (height,width ,value),
+                          ]);
+                    default:
+                      return const Text("Best seller default");
+                  }
+                })
+            ),
+          ),  Container(
+              margin:  EdgeInsets.all(10),
+              child:  packageListViw(selectedIndex))
+        ]);
+  }
+
+  Widget _segmentedControl() =>
+
+      CustomSlidingSegmentedControl<int>(
+        initialValue:  segmentedControlValue ,
+        fixedWidth:     100,
+
+        children: {
+          1: Text('India', style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color:  Colors.black ,
+            // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
+          ),),
+          2: Text('World',style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color:  Colors.black ,
+            // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
+          ),),
+
+        },
+        decoration: BoxDecoration(
+
+          color:  CupertinoColors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        thumbDecoration: BoxDecoration(
+
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color:  Colors.black.withOpacity(.3),
+              blurRadius: 4.0,
+              spreadRadius: 1.0,
+              offset: Offset(
+                0.0,
+                2.0,
               ),
-            ),  Container(
-          margin:  EdgeInsets.all(10),
-                child:  packageListViw(selectedIndex))
-          ]);
-       }
+            ),
+          ],
+        ),
 
-       Widget _segmentedControl() =>
+        ///duration: Duration(milliseconds: 300),
+        curve: Curves.easeInToLinear,
+        onValueChanged: (v) {
+          print(v);
+          setState(() {
+            segmentedControlValue = v;
+            super.initState();
+          });
+        },
+      );
 
-  CustomSlidingSegmentedControl<int>(
-  initialValue:  segmentedControlValue ,
-    fixedWidth:     100,
-
-  children: {
-  1: Text('India', style: TextStyle(
-  fontWeight: FontWeight.bold,
-  color:  Colors.black ,
-  // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
-  ),),
-  2: Text('World',style: TextStyle(
-  fontWeight: FontWeight.bold,
-  color:  Colors.black ,
-  // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
-  ),),
-
-  },
-  decoration: BoxDecoration(
-
-  color:  CupertinoColors.white,
-  borderRadius: BorderRadius.circular(8),
-  ),
-  thumbDecoration: BoxDecoration(
-
-  color: Colors.blue,
-  borderRadius: BorderRadius.circular(6),
-  boxShadow: [
-  BoxShadow(
-  color:  Colors.black.withOpacity(.3),
-  blurRadius: 4.0,
-  spreadRadius: 1.0,
-  offset: Offset(
-  0.0,
-  2.0,
-  ),
-  ),
-  ],
-  ),
-
-  ///duration: Duration(milliseconds: 300),
-  curve: Curves.easeInToLinear,
-  onValueChanged: (v) {
-  print(v);
-  setState(() {
-    segmentedControlValue = v;
-    super.initState();
-  });
-  },
-  );
-
-     Widget buildCategory(int index, List<FilterCategoryData> value) {
+  Widget buildCategory(int index, List<FilterCategoryData> value) {
     return GestureDetector(
       onTap: () {
         setState(() {
           selectedIndex = index;
           var category =   (value[index].slug  ?? "").toString();
-           if  ( category == "All") {
+          if  ( category == "All") {
 
-              homeViewViewModel.fetchViewAllPackageApi(widget.packageurl);
-            }
-            else {
-               homeViewViewModel.fetchViewAllPackageApi(widget.packageurl + "?page=1&filter[state_slug]=" + category);
-              }
-            //super.initState();
-         });
-       },
+            homeViewViewModel.fetchViewAllPackageApi(widget.packageurl);
+          }
+          else {
+            homeViewViewModel.fetchViewAllPackageApi(widget.packageurl + "?page=1&filter[state_slug]=" + category);
+          }
+          //super.initState();
+        });
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-        padding: EdgeInsets.only(
-          bottom: 5, // Space between underline and text
-        ),
-        decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(
-              color: selectedIndex == index ? kTextColor : Colors.transparent,
-              width:2.0, // Underline thickness
-            ))
-        ),
-          child:  Text(
-              value[index].value  ?? "",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: selectedIndex == index ? kTextColor : kTextLightColor,
-               // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
-               ),
-              )),
+                padding: EdgeInsets.only(
+                  bottom: 5, // Space between underline and text
+                ),
+                decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(
+                      color: selectedIndex == index ? kTextColor : Colors.transparent,
+                      width:2.0, // Underline thickness
+                    ))
+                ),
+                child:  Text(
+                  value[index].value  ?? "",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: selectedIndex == index ? kTextColor : kTextLightColor,
+                    // decoration: selectedIndex == index ?  TextDecoration.underline :  TextDecoration.none ,
+                  ),
+                )),
 
           ],
         ),
       ),
-     );
-     }
-     Widget packageListViw(int index) {
+    );
+  }
+  Widget packageListViw(int index) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return  Column(
@@ -399,9 +399,9 @@ class _ProItemsState extends State<ProItems> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           _viewAllPackageList(height, width, value)
-                           // (height,width ,value),
+                          // (height,width ,value),
                         ]);
-                   default:
+                  default:
                     return const Text("Best seller default");
                 }
               })
@@ -410,12 +410,12 @@ class _ProItemsState extends State<ProItems> {
         ]
     );
 
-    }
+  }
 
-    Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
+  Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
 
 
-        return  ListView.builder(
+    return  ListView.builder(
 
         itemCount: value.getPackageViewAllList.data?.data?.data?.length,
         shrinkWrap: true,
@@ -424,157 +424,157 @@ class _ProItemsState extends State<ProItems> {
           return GestureDetector(
               onTap: () {
 
-                 print(value.getPackageViewAllList.data?.data?.data?[index].slug ?? "");
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+                print(value.getPackageViewAllList.data?.data?.data?[index].slug ?? "");
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "",price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.price.toString() ?? "",discounted_price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.discountedPrice.toString() ?? "")));
 
-            //Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailViews()));
-          },
-            child:   Card(
+                //Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailViews()));
+              },
+              child:   Card(
                   color: Colors.white,
                   elevation: 16,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Stack(alignment: Alignment.topLeft, children: [
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
-                         borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10),
-                      ),
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                  Positioned(
-                      top: 20,
-                      left: 0,
-
-                      child:
-                      Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                          color: Colors.green,
-                        ),
-                        // color: Colors.greenAccent
-                        height: 25,
-                        child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
-                          color: AppColors.blackColor,
-                        )),
-
-                      )
-                  ),
-
-                ],
-
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Triplist(),
-                ),
-                SizedBox(height:10),
-                Padding(
-                    padding: const EdgeInsets.only(left: 10, right:10),
-
-                    child: Column(
-
-                    children: [
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-                          Expanded (
-                         child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
-                            color: AppColors.blackColor,
-                          ))),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(alignment: Alignment.topLeft, children: [
                           Container(
-                            padding: const EdgeInsets.all(5.0),
-                            // color: Colors.blue,
+                            height: 200,
                             decoration: BoxDecoration(
-
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              color: Colors.blue,
+                              image: DecorationImage(
+                                  fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
+                              color: Colors.redAccent,
                             ),
-                            child: Column(children: [
-                              Text("Save upto"),
-                              Text("₹ 2500")
-                            ]),
-                          )
+                          ),
+                          Positioned(
+                              top: 20,
+                              left: 0,
 
-                        ]),
-                      Row(
-
-                           mainAxisAlignment: MainAxisAlignment.start,
-
-                           children: [
-
-                              Expanded(child:
-                             Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
-
-                           ],),
-                    ])
-                  ),
-                SizedBox(height:10),
-                Padding(
-                    padding: const EdgeInsets.only(left: 10, right:10),
-
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-
-                          Expanded(child:
-                          Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
-                          Container(
-                            padding: const EdgeInsets.all(10.0),
-
-                            child: Column(children: [
-
-                              Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
-                                  style: AppStyle.instance.bodySmallBold.copyWith(
-                                    color: AppColors.blackColor,
-
-                                  )),
-
-                              if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
-                               Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
+                              child:
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                  ),
+                                  color: Colors.green,
+                                ),
+                                // color: Colors.greenAccent
+                                height: 25,
+                                child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
                                   color: AppColors.blackColor,
-                                  decoration: TextDecoration.lineThrough))
+                                )),
 
-                            ]),
-                          )
+                              )
+                          ),
 
-                        ])),
-                 Padding(
-                  padding: const EdgeInsets.only(left: 10, right:10),
-                  child: Divider(
-                    color: Colors.grey,
-                    height: 1,
-                  ),
-                ),
-                SizedBox(height:10),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
-                  child: Menulist(),
-                ),
-              ])));
+                        ],
+
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                          child: Triplist(),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 10, right:10),
+
+                            child: Column(
+
+                                children: [
+                                  Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                      children: [
+                                        Expanded (
+                                            child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
+                                              color: AppColors.blackColor,
+                                            ))),
+                                        Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          // color: Colors.blue,
+                                          decoration: BoxDecoration(
+
+                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                            color: Colors.blue,
+                                          ),
+                                          child: Column(children: [
+                                            Text("Save upto"),
+                                            Text("₹ 2500")
+                                          ]),
+                                        )
+
+                                      ]),
+                                  Row(
+
+                                    mainAxisAlignment: MainAxisAlignment.start,
+
+                                    children: [
+
+                                      Expanded(child:
+                                      Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
+
+                                    ],),
+                                ])
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 10, right:10),
+
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                children: [
+
+                                  Expanded(child:
+                                  Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
+                                  Container(
+                                    padding: const EdgeInsets.all(10.0),
+
+                                    child: Column(children: [
+
+                                      Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
+                                          style: AppStyle.instance.bodySmallBold.copyWith(
+                                            color: AppColors.blackColor,
+
+                                          )),
+
+                                      if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
+                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
+                                            color: AppColors.blackColor,
+                                            decoration: TextDecoration.lineThrough))
+
+                                    ]),
+                                  )
+
+                                ])),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right:10),
+                          child: Divider(
+                            color: Colors.grey,
+                            height: 1,
+                          ),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
+                          child: Menulist(),
+                        ),
+                      ])));
 
         });
-      }
+  }
 
   String getImage(List<ViewAllPackageImage> inputlist) {
 
@@ -588,7 +588,7 @@ class _ProItemsState extends State<ProItems> {
       }
     }
     return imgPath;
-   }
+  }
 
 }
 class CustomPackage extends StatefulWidget {
@@ -608,8 +608,8 @@ class _CustomPackagItemsState extends State<CustomPackage> {
   int selectedIndex = 0;
   @override
   void initState() {
-     print(widget.type);
-     homeViewViewModel.fetchCustomPackage(widget.type);
+    print(widget.type);
+    homeViewViewModel.fetchCustomPackage(widget.type);
     // homeViewViewModel.fetchFiltetCategotyApi(AppUrl.customizedpackagesstatelist  + "");
 
     super.initState();
@@ -667,12 +667,12 @@ class _CustomPackagItemsState extends State<CustomPackage> {
             ),
 
           ),
-           Container(
+          Container(
               margin:  EdgeInsets.all(10),
               child:  packageListViw())
         ]);
-     }
-     Widget buildCategory(int index, List<CustomoPackageData> value) {
+  }
+  Widget buildCategory(int index, List<CustomoPackageData> value) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -689,13 +689,13 @@ class _CustomPackagItemsState extends State<CustomPackage> {
           super.initState();
         });
       },
-       child: Padding(
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-             Container(
-                  padding: EdgeInsets.only(
+            Container(
+                padding: EdgeInsets.only(
                   bottom: 5, // Space between underline and text
                 ),
                 decoration: BoxDecoration(
@@ -703,8 +703,8 @@ class _CustomPackagItemsState extends State<CustomPackage> {
                       color: selectedIndex == index ? kTextColor : Colors.transparent,
                       width:2.0, // Underline thickness
                     ))
-                  ),
-                  child:  Text(
+                ),
+                child:  Text(
                   value[index].name  ?? "",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -743,7 +743,7 @@ class _CustomPackagItemsState extends State<CustomPackage> {
                           _viewAllPackageList(height, width, value)
                           // (height,width ,value),
                         ]);
-                   default:
+                  default:
                     return const Text("Best seller default");
                 }
               })
@@ -751,168 +751,168 @@ class _CustomPackagItemsState extends State<CustomPackage> {
         ]
     );
 
-   }
-   Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
+  }
+  Widget _viewAllPackageList(double height, double width, HomeViewViewModel value) {
 
-        return  ListView.builder(
-            itemCount: value.getPackageViewAllList.data?.data?.data?.length,
-            shrinkWrap: true,
-            physics: ScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
+    return  ListView.builder(
+        itemCount: value.getPackageViewAllList.data?.data?.data?.length,
+        shrinkWrap: true,
+        physics: ScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
 
-              return GestureDetector(
-                  onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "")));
+          return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductDetailView(slug: value.getPackageViewAllList.data?.data?.data?[index].slug ?? "",price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.price.toString() ?? "",discounted_price: value.getPackageViewAllList.data?.data?.data![index].defaultPrice!.discountedPrice.toString() ?? "")));
               },
-             child:   Card(
-                    color: Colors.white,
-                    elevation: 16,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Stack(alignment: Alignment.topLeft, children: [
-                            Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
-                                ),
-                                color: Colors.redAccent,
+              child:   Card(
+                  color: Colors.white,
+                  elevation: 16,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(alignment: Alignment.topLeft, children: [
+                          Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.cover, image: NetworkImage(Imagepath.PackageListinPath.description + getImage( value.getPackageViewAllList.data!.data!.data![index].image!))),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
                               ),
+                              color: Colors.redAccent,
                             ),
-                            Positioned(
-                                top: 20,
-                                left: 0,
+                          ),
+                          Positioned(
+                              top: 20,
+                              left: 0,
 
-                                child:
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                    ),
-                                    color: Colors.green,
+                              child:
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10),
+                                    topRight: Radius.circular(10),
                                   ),
-                                  // color: Colors.greenAccent
+                                  color: Colors.green,
+                                ),
+                                // color: Colors.greenAccent
 
-                                  height: 25,
-                                  child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
-                                    color: AppColors.blackColor,
-                                  )),
+                                height: 25,
+                                child: Text("Best Saller", style: AppStyle.instance.bodyVerySmall.copyWith(
+                                  color: AppColors.blackColor,
+                                )),
 
-                                )
-                            ),
-
-                          ],
-
+                              )
                           ),
 
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                            child: Triplist(),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
+                        ],
 
-                              child: Column(
+                        ),
 
-                                  children: [
-                                    Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                          child: Triplist(),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 10, right:10),
 
-                                        children: [
-                                          Expanded (
-                                              child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
-                                                color: AppColors.blackColor,
-                                              ))),
-                                          Container(
-                                            padding: const EdgeInsets.all(5.0),
-                                            // color: Colors.blue,
-                                            decoration: BoxDecoration(
+                            child: Column(
 
-                                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                                              color: Colors.blue,
-                                            ),
-                                            child: Column(children: [
-                                              Text("Save upto"),
-                                              Text("₹ 2500")
-                                            ]),
-                                          )
-
-                                        ]),
-                                    Row(
-
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                                       children: [
-
-                                        Expanded(child:
-                                        Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
-
-                                      ],),
-                                  ])
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10, right:10),
-
-                              child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                  children: [
-
-                                    Expanded(child:
-                                    Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
-                                    Container(
-                                      padding: const EdgeInsets.all(10.0),
-
-                                      child: Column(children: [
-
-                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
-                                            style: AppStyle.instance.bodySmallBold.copyWith(
+                                        Expanded (
+                                            child: Text(value.getPackageViewAllList.data!.data!.data![index].title ?? "", style: AppStyle.instance.bodySmallBold.copyWith(
                                               color: AppColors.blackColor,
+                                            ))),
+                                        Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          // color: Colors.blue,
+                                          decoration: BoxDecoration(
 
-                                            )),
-
-                                        if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
-                                          Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
-                                              color: AppColors.blackColor,
-                                              decoration: TextDecoration.lineThrough))
+                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                            color: Colors.blue,
+                                          ),
+                                          child: Column(children: [
+                                            Text("Save upto"),
+                                            Text("₹ 2500")
+                                          ]),
+                                        )
 
                                       ]),
-                                    )
+                                  Row(
 
-                                  ])),
-                          Padding(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+
+                                    children: [
+
+                                      Expanded(child:
+                                      Text((value.getPackageViewAllList.data!.data!.data![index].startingFrom ?? "") + " to " +  (value.getPackageViewAllList.data!.data!.data![index].endingTo ?? "") + " " + (value.getPackageViewAllList.data!.data!.data![index].duration! - 1).toString()  + "N/" + (value.getPackageViewAllList.data!.data!.data![index].duration).toString() + "D" )),
+
+                                    ],),
+                                ])
+                        ),
+                        SizedBox(height:10),
+                        Padding(
                             padding: const EdgeInsets.only(left: 10, right:10),
-                            child: Divider(
-                              color: Colors.grey,
-                              height: 1,
-                            ),
-                          ),
-                          SizedBox(height:10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
-                            child: Menulist(),
-                          ),
-                        ])));
 
-            });
-         }
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-   String getImage(List<ViewAllPackageImage> inputlist) {
+                                children: [
+
+                                  Expanded(child:
+                                  Monthlist(dateList: value.getPackageViewAllList.data!.data!.data![index].batches!)),
+                                  Container(
+                                    padding: const EdgeInsets.all(10.0),
+
+                                    child: Column(children: [
+
+                                      Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.price ?? "").toString(),
+                                          style: AppStyle.instance.bodySmallBold.copyWith(
+                                            color: AppColors.blackColor,
+
+                                          )),
+
+                                      if (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice != null)
+                                        Text("₹" + (value.getPackageViewAllList.data!.data!.data![index].defaultPrice?.discountedPrice ?? "").toString(), style: AppStyle.instance.bodySmall.copyWith(
+                                            color: AppColors.blackColor,
+                                            decoration: TextDecoration.lineThrough))
+
+                                    ]),
+                                  )
+
+                                ])),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, right:10),
+                          child: Divider(
+                            color: Colors.grey,
+                            height: 1,
+                          ),
+                        ),
+                        SizedBox(height:10),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, bottom: 10,right: 10),
+                          child: Menulist(),
+                        ),
+                      ])));
+
+        });
+  }
+
+  String getImage(List<ViewAllPackageImage> inputlist) {
 
     var imgPath ;
 
@@ -922,11 +922,11 @@ class _CustomPackagItemsState extends State<CustomPackage> {
 
         imgPath =  item.image;
       }
-     }
+    }
     return imgPath;
   }
-  }
-  class Sorting extends StatefulWidget {
+}
+class Sorting extends StatefulWidget {
   @override
   _SortingState createState() => _SortingState();
 }
@@ -957,7 +957,7 @@ class _SortingState extends State<Sorting> {
                 ],
               ),
 
-             ),
+            ),
             Container(
               height: 40,
               width: 127,
@@ -972,8 +972,8 @@ class _SortingState extends State<Sorting> {
               ),
             ),
           ],
-         )
-        );
+        )
+    );
     //);
   }
 }
@@ -1020,7 +1020,7 @@ class _MenuListState extends State<MenuList> {
               color: AppColors.blackColor,
             ))
 
-           ],),
+          ],),
           Column( children: <Widget>[
             Container(
               width: 45,
@@ -1077,11 +1077,11 @@ class _MenuListState extends State<MenuList> {
         ],
       ),
 
-     );
+    );
     //);
   }
- }
- class OganizedList extends StatefulWidget {
+}
+class OganizedList extends StatefulWidget {
   @override
   _OganizedListState createState() => _OganizedListState();
 }
@@ -1173,7 +1173,7 @@ class _OganizedListState extends State<OganizedList> {
     );
     //);
   }
- }
+}
 class DiscountBannar extends StatefulWidget {
   @override
   _DiscountBannarState createState() => _DiscountBannarState();
@@ -1218,8 +1218,8 @@ class _DiscountBannarState extends State<DiscountBannar> {
           ],
         ),
       );
-   }
- }
+  }
+}
 const kTextColor = Color(0xFF535353);
 const kTextLightColor = Color(0xFFACACAC);
 const kDefaultPaddin = 20.0;

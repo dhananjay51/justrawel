@@ -30,6 +30,9 @@ class AppUrl {
   static var   customizedpackagesstatelist     =     '$appBaseUrl/api/CustomizedPackages-state/';
   static var   custominternationalPackagelist  =     '$appBaseUrl/api/CustomizedPackages-country/';
   static var   PackageDetails  =     '$appBaseUrl/api/package-detail/';
+  static var   login  =     '$appBaseUrl/api/login';
+  static var   otpVarify  =     '$appBaseUrl/api/loginWithOtp';
+  static var   register  =     '$appBaseUrl/api/package-detail/';
 
   }
 
@@ -44,7 +47,7 @@ class AppUrl {
   PackageListinPath,
   VideoImgpath
   }
-extension ImageExtension on Imagepath {
+ extension ImageExtension on Imagepath {
   String get description {
     switch (this) {
       case Imagepath.categryPath:

@@ -1,12 +1,28 @@
+import 'dart:convert';
+import 'dart:math';
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:justwravel/View/HomeView/ProductDetail/PackingViewScreen.dart';
 import 'package:justwravel/View/NavigationView/CustomAppBar.dart';
+import 'package:justwravel/data/network/AppUrl.dart';
+import 'package:justwravel/models/otp_varification.dart';
 import 'package:justwravel/res/color.dart';
-
+import 'package:justwravel/models/login_model.dart';
 import '../../res/style/text_style.dart';
+import 'package:http/http.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
+import 'package:justwravel/models/otp_varification.dart';
+ import 'package:fluttertoast/fluttertoast.dart';
+
+
+import 'package:otp_pin_field/otp_pin_field.dart';
+
 
 class LoginScreen extends StatefulWidget{
 
@@ -14,23 +30,46 @@ class LoginScreen extends StatefulWidget{
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>{
+class _LoginScreenState extends State<LoginScreen> {
   var isScreen = "Login";
+  var otp = "";
+  var isMobileno = "";
+
   bool _isLocked = false;
   bool _isCollapsed = true;
   bool _isExpanded = false;
   int _listSize = 1;
+  bool visible = true;
+  bool _validate = false;
+  int secondsRemaining = 30;
+  bool enableResend = false;
+  late Timer timer ;
+  final TextEditingController phoneNoController = TextEditingController();
+
   final _bsbController = BottomSheetBarController();
   @override
   void initState() {
     _bsbController.addListener(_onBsbChanged);
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      if (secondsRemaining != 0) {
+        setState(() {
+          secondsRemaining--;
+        });
+      } else {
+        setState(() {
+          enableResend = true;
+        });
+      }
+    });
     super.initState();
   }
+
   @override
   void dispose() {
     _bsbController.removeListener(_onBsbChanged);
     super.dispose();
   }
+
   void _onBsbChanged() {
     if (_bsbController.isCollapsed && !_isCollapsed) {
       setState(() {
@@ -98,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen>{
                ),
                //login()
                Container(child: isScreen=="Login"?login():isScreen=="Register"?register()
-                   :isScreen=="Otp"?OtpVerify():Container())
+                   :isScreen=="Otp"?OtpVerify(isMobileno):Container())
              ],
 
            ),
@@ -109,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen>{
          List<int>.generate(_listSize, (index) => index + 1);
 
          // Wrapping the returned widget with [Material] for tap effects
-         return Material(
+          return Container(
            color: Colors.white,
            child: Wrap(
              children: [
@@ -341,7 +380,79 @@ class _LoginScreenState extends State<LoginScreen>{
 
 
   Widget login(){
-    return Container(
+
+    String validateMobile(String value) {
+// Indian Mobile number are of 10 digit only
+      if (value.length != 10)
+        return 'Mobile Number must be of 10 digit';
+      else
+        return "";
+    }
+
+    void login(String mobileno ) async {
+
+// Hiding the CircularProgressIndicator.
+      setState(() {
+        visible = false;
+      });
+      try{
+
+        Response response = await post(
+            Uri.parse(AppUrl.login),
+            body: {
+              'phone' : mobileno,
+              'country_code' : '+91'
+            }
+        );
+        if(response.statusCode == 200){
+// Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+
+          final Map<String, dynamic> jsonMap = jsonDecode(response.body);
+         final  user =     LoginModel.fromJson(jsonMap);
+          print(user.message);
+
+            isMobileno = mobileno;
+            isScreen="Otp";
+
+        }
+          else {
+          print('failed');
+
+          Fluttertoast.showToast(
+              msg: "failed",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+          // Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+        }
+        }catch(e){
+        // Hiding the CircularProgressIndicator.
+        setState(() {
+          visible = true;
+        });
+        print(e.toString());
+        Fluttertoast.showToast(
+            msg: e.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+      }
+      return Container(
       margin: EdgeInsets.only(top: 100),
       child: Column(
         children: [
@@ -368,15 +479,24 @@ class _LoginScreenState extends State<LoginScreen>{
                             child: SizedBox(
                               width: 250,
                               child: TextField(
+                                controller: phoneNoController,
+
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(color: Colors.black),
                                 obscureText: false,
-                                decoration: new InputDecoration.collapsed(
-                                    hintText: '---- ----'
-                                ),
+                                 decoration: new InputDecoration(
+                                    hintText: '---- ----',
+                                  // errorText: _validate ? "Please enter valid Mobile No." : null,
 
+                                  ),
+                                  onChanged: (text) => {
+                                   debugPrint("hello"),
+
+
+                                },
                               ),)
-                        )
+                        ),
+
 
 
                       ],
@@ -390,17 +510,37 @@ class _LoginScreenState extends State<LoginScreen>{
                         )
 
                     )
-                )
-
+                ),
+                 Text(_validate ? "Please enter valid mobile No." : "", style: TextStyle(color: Colors.red)),
               ],
             ),
           ),
-          GestureDetector(
+        visible ? GestureDetector(
             onTap: (){
               setState(() {
-                isScreen="Otp";
-              });
-            },
+
+                FocusScope.of(context).unfocus();
+
+
+                _validate = phoneNoController.text.isEmpty;
+
+                  if (_validate)  {
+
+                  //  visible = false;
+                  }
+                  else {
+
+                    visible = false;
+                   // visible = true;
+
+                     login(phoneNoController.text);
+
+                  }
+
+
+
+               });
+             },
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Container(
@@ -417,9 +557,11 @@ class _LoginScreenState extends State<LoginScreen>{
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 10,),
-          GestureDetector(
+           ) : CircularProgressIndicator(),
+
+
+           SizedBox(height: 10,),
+           GestureDetector(
              onTap: (){
                setState(() {
                  isScreen="Register";
@@ -430,8 +572,80 @@ class _LoginScreenState extends State<LoginScreen>{
         ],
       ),
     );
+
   }
-  Widget OtpVerify(){
+
+  Widget OtpVerify(String mobileno ){
+
+    void optvarify() async {
+
+// Hiding the CircularProgressIndicator.
+      setState(() {
+        visible = false;
+      });
+      try{
+
+        Response response = await post(
+            Uri.parse(AppUrl.otpVarify),
+            body: {
+              'phone' : mobileno,
+              'country_code' : '+91',
+              "otp" : otp
+
+            }
+        );
+        if(response.statusCode == 200){
+// Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+
+          final Map<String, dynamic> jsonMap = jsonDecode(response.body);
+          final  user =     Otpvarification.fromJson(jsonMap);
+          print(user.message);
+           print(user.data?.firstName);
+
+            if (user.data!.phone!.length  >  0){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen()));
+            }
+            else {
+              isScreen="Register";
+            }
+
+
+        }else {
+          print('failed');
+          Fluttertoast.showToast(
+              msg: "failed",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+          // Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+        }
+      }catch(e){
+        // Hiding the CircularProgressIndicator.
+        setState(() {
+          visible = true;
+        });
+        print(e.toString());
+        Fluttertoast.showToast(
+            msg: e.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+       }
+     }
     return Container(
       margin: EdgeInsets.only(top: 100),
       child: Column(
@@ -440,83 +654,50 @@ class _LoginScreenState extends State<LoginScreen>{
           SizedBox(height: 5,),
           Text("OTP has been sent to your registered Mobile Number", style: TextStyle(color: Colors.grey,fontSize: 12),),
 SizedBox(height: 5,),
-          Text("(+91- 12345 67890)", style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 13),),
+          Text((' + 91-' + mobileno ), style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 13),),
           SizedBox(height: 20,),
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.only(left: 30),
-              width: double.infinity,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+            child:
 
-                  Container(
-                      height: 64.0,
-                      width: 56.0,
-                      child: Card(
-                          color: Color.fromRGBO(173, 179, 191, 0.7),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: otpField()
-                          )
-                      )
-                  ),
-                  SizedBox(width: 10,),
-                  Container(
-                      height: 64.0,
-                      width: 56.0,
-                      child: Card(
-                          color: Color.fromRGBO(173, 179, 191, 0.7),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: otpField()
-                          )
-                      )
-                  ),
-                  SizedBox(width: 10,),
-                  Container(
-                      height: 64.0,
-                      width: 56.0,
-                      child: Card(
-                          color: Color.fromRGBO(173, 179, 191, 0.7),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: otpField()
-                          )
-                      )
-                  ),
-                  SizedBox(width: 10,),
-                  Container(
-                      height: 64.0,
-                      width: 56.0,
-                      child: Card(
-                          color: Color.fromRGBO(173, 179, 191, 0.7),
-                          child: Padding(
-                              padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                              child: otpField()
-                          )
-                      )
-                  ),
+          Container(
+           // height: 50,
+            child: OtpPinField(
+              maxLength: 4,
+             otpPinFieldDecoration:
+                 OtpPinFieldDecoration.defaultPinBoxDecoration,
+              onSubmit: (String pin) {
+                print("OTP Entered: $pin");
+                 otp = pin;
 
-                ],
-              ),
+              }, onChange: (String text) {  },
+
             ),
-          ),
-          GestureDetector(
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen()));
 
-            },
+          )),
+
+          SizedBox(height: 15),
+
+          visible ?   GestureDetector(
+            onTap: (){
+
+              if (otp.length == 4) {
+
+                  visible = false;
+                  optvarify();
+               }
+               else {
+                visible = true;
+               }
+               },
+
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.only(left: 16,right: 16),
               child: Container(
                 width: double.infinity,
                 child: Center(
                   child: Text(
                     'Login',
-
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -527,15 +708,31 @@ SizedBox(height: 5,),
                 ),
               ),
             ),
-          ),
+          ) : CircularProgressIndicator(),
+
           SizedBox(height: 10,),
-          Text("Resend OTP in (00.00)", style: TextStyle(color: AppColors.grayColor,fontSize: 13),),
+          enableResend == true?  GestureDetector(
+             onTap: (){
+               enableResend = false;
+               _resendCode();
+             },
+           child: Text ("Resend OTP",style: TextStyle(color: AppColors.blackColor,fontSize: 13),)
+
+         ) : Text("Resend OTP in ($secondsRemaining)", style: TextStyle(color: AppColors.grayColor,fontSize: 13),),
+
 
         ],
       ),
     );
-  }
 
+  }
+  void _resendCode() {
+    //other code here
+    setState((){
+      secondsRemaining = 30;
+      enableResend = false;
+    });
+  }
   Widget otpField(){
     return TextField(
         textAlign: TextAlign.center,
@@ -549,7 +746,6 @@ SizedBox(height: 5,),
         )
     );
   }
-
   Widget register(){
     return Container(
       margin: EdgeInsets.only(top: 100),
@@ -584,26 +780,26 @@ SizedBox(height: 5,),
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'First name'
                                     ),
-    
+
                                   ),
                                 ),
                               ),)
                         )
-    
-    
+
+
                       ],
-    
+
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.all(Radius.circular(20),
-    
+
                         )
-    
+
                     )
                 )
-    
+
               ],
             ),
           ),
@@ -632,26 +828,26 @@ SizedBox(height: 5,),
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'Last name'
                                     ),
-    
+
                                   ),
                                 ),
                               ),)
                         )
-    
-    
+
+
                       ],
-    
+
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.all(Radius.circular(20),
-    
+
                         )
-    
+
                     )
                 )
-    
+
               ],
             ),
           ),
@@ -680,26 +876,26 @@ SizedBox(height: 5,),
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'xyz@gmail.com'
                                     ),
-    
+
                                   ),
                                 ),
                               ),)
                         )
-    
-    
+
+
                       ],
-    
+
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.all(Radius.circular(20),
-    
+
                         )
-    
+
                     )
                 )
-    
+
               ],
             ),
           ),
@@ -716,7 +912,7 @@ SizedBox(height: 5,),
                 child: Center(
                   child: Text(
                     'Submit',
-                
+
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -736,7 +932,7 @@ SizedBox(height: 5,),
                 });
               },
               child: Text("Login Here", style: TextStyle(color: AppColors.appbarlinearColor,fontSize: 15),)),
-    
+
         ],
       ),
     );

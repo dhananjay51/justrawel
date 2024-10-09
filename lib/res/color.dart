@@ -19,4 +19,5 @@ class AppColors {
   static const Color lightGreenGroundColor = Color(0xFFD8F8C7);
   static const Color lightRedGroundColor = Color(0xFFF8C7CE);
   static const Color txtColor = Color(0xFF717171);
+  static const Color tooGrayColor = Color(0xFFF3F3F4);
 }

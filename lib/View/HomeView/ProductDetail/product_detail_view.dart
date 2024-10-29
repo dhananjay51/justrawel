@@ -1805,8 +1805,6 @@ class _PopularListViewState extends State<SimilarPackageListView> {
                         child:  Row(
 
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-
                           children: <Widget>[
 
                             Text("Similar Packages", textAlign: TextAlign.center, style: AppStyle.instance.bodySmallBold.copyWith(

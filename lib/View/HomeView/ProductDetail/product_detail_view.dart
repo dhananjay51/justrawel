@@ -260,12 +260,23 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                       ),
                                     ),
                                     SizedBox(height: 5),
-                                    Text(
-                                      "₹" + widget.price,
-                                      style: AppStyle.instance.bodySmallBold.copyWith(
-                                        color: AppColors.blackColor,
-                                        fontSize: 17,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "₹" + widget.price,
+                                          style: AppStyle.instance.bodySmallBold.copyWith(
+                                            color: AppColors.blackColor,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        Text(
+                                          "+ 5% GST",
+                                          style: AppStyle.instance.bodyMedium.copyWith(
+                                            color: AppColors.grayColor,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -853,7 +864,6 @@ class _PackageInfoState extends State<PackageInfoDetail> {
       ),
     ),
   );
-
   Widget _itinearyListControl(List<ItineraryDayWise>?  itineraryDayWise,int index) => Column(
     children: [
       Row(

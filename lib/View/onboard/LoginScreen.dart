@@ -22,9 +22,15 @@ import 'package:justwravel/models/otp_varification.dart';
 
 
 import 'package:otp_pin_field/otp_pin_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class LoginScreen extends StatefulWidget{
+  final Map<String, dynamic> bookingData;
+  final String startingFrom;
+  final String endingFrom;
+  final String startEndDate;
+  const LoginScreen({Key? key,required this.startingFrom,required this.endingFrom,required this.startEndDate,required this.bookingData}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -45,6 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool enableResend = false;
   late Timer timer ;
   final TextEditingController phoneNoController = TextEditingController();
+  final TextEditingController firstname = TextEditingController();
+  final TextEditingController lastname = TextEditingController();
+  final TextEditingController  email = TextEditingController();
+  var token ="";
 
   final _bsbController = BottomSheetBarController();
   @override
@@ -591,7 +601,6 @@ class _LoginScreenState extends State<LoginScreen> {
               'phone' : mobileno,
               'country_code' : '+91',
               "otp" : otp
-
             }
         );
         if(response.statusCode == 200){
@@ -604,13 +613,24 @@ class _LoginScreenState extends State<LoginScreen> {
           final  user =     Otpvarification.fromJson(jsonMap);
           print(user.message);
            print(user.data?.firstName);
+          token=user.data!.token.toString();
+        //
 
-            if (user.data!.phone!.length  >  0){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen()));
+           var userPhone =   user.data?.phone ?? "";
+          var email =   user.data?.email ?? "";
+            if (userPhone.length  >  0 &&  email.length > 0){
+
+              saveLoginStatus(user.data!.token.toString(),user.data!.id.toString(),user.data!.firstName.toString(),user.data!.lastName.toString()
+                  ,user.data!.countryCode.toString(),user.data!.email.toString(),user.data!.phone.toString());
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen(startingFrom: widget.startingFrom!.toString(),endingFrom: widget.endingFrom!.toString(),startEndDate:widget.startEndDate,bookingData: widget.bookingData,)));
+
+
             }
             else {
               isScreen="Register";
             }
+
+
 
 
         }else {
@@ -747,7 +767,83 @@ SizedBox(height: 5,),
     );
   }
   Widget register(){
-    return Container(
+
+
+    void singUp() async {
+
+
+// Hiding the CircularProgressIndicator.
+      setState(() {
+        visible = false;
+      });
+      try{
+        Response response = await post(
+            Uri.parse(AppUrl.register),
+            body: {
+              'first_name' : firstname.text,
+              'last_name' : lastname.text,
+              "email" : email.text,
+              "gender" : "male",
+            },
+            headers: {
+              'X-Requested-With': ' XMLHttpRequest',
+              'Accept': 'application/json',
+              'Authorization':"Bearer "+token,
+            }
+        );
+        if(response.statusCode == 200){
+// Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+
+          final Map<String, dynamic> jsonMap = jsonDecode(response.body);
+          final  user =     Otpvarification.fromJson(jsonMap);
+          print(user.message);
+          print(user.data?.firstName);
+
+          if ((user.data?.firstName ?? "" ).length  >  0  &&  (user.data?.email ?? "" ).length >  0){
+
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen(startingFrom: widget.startingFrom!.toString(),endingFrom: widget.endingFrom!.toString(),startEndDate:widget.startEndDate,bookingData: widget.bookingData,)));
+          }
+          else {
+            isScreen="Register";
+          }
+
+
+        }else {
+          print('failed');
+          Fluttertoast.showToast(
+              msg: response.body,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+          // Hiding the CircularProgressIndicator.
+          setState(() {
+            visible = true;
+          });
+        }
+      }catch(e){
+        // Hiding the CircularProgressIndicator.
+        setState(() {
+          visible = true;
+        });
+        print(e.toString());
+        Fluttertoast.showToast(
+            msg: e.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    }return Container(
       margin: EdgeInsets.only(top: 100),
       child: Column(
         children: [
@@ -774,9 +870,10 @@ SizedBox(height: 5,),
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: TextField(
+                                    controller: firstname,
                                     keyboardType: TextInputType.name,
                                     style: TextStyle(color: Colors.black,fontSize: 13),
-                                    obscureText: true,
+                                    obscureText: false,
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'First name'
                                     ),
@@ -822,9 +919,10 @@ SizedBox(height: 5,),
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: TextField(
+                                    controller: lastname,
                                     keyboardType: TextInputType.name,
                                     style: TextStyle(color: Colors.black,fontSize: 13),
-                                    obscureText: true,
+                                    obscureText: false,
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'Last name'
                                     ),
@@ -870,9 +968,10 @@ SizedBox(height: 5,),
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: TextField(
+                                    controller: email,
                                     keyboardType: TextInputType.emailAddress,
                                     style: TextStyle(color: Colors.black,fontSize: 13),
-                                    obscureText: true,
+                                    obscureText: false,
                                     decoration: new InputDecoration.collapsed(
                                         hintText: 'xyz@gmail.com'
                                     ),
@@ -899,12 +998,24 @@ SizedBox(height: 5,),
               ],
             ),
           ),
-          GestureDetector(
+
+
+          visible ? GestureDetector(
             onTap: (){
-              setState(() {
-                isScreen="Login";
-              });
+
+              if (firstname.text.length > 0 && lastname.text.length > 0  && email.text.length > 0) {
+
+                visible = false;
+
+                singUp();
+                print("submit");
+
+              }
+              else {
+                visible = true;
+              }
             },
+
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Container(
@@ -923,8 +1034,9 @@ SizedBox(height: 5,),
                 ),
               ),
             ),
-          ),
+          ) :  CircularProgressIndicator(),
           SizedBox(height: 10,),
+
           GestureDetector(
               onTap: (){
                 setState(() {
@@ -937,5 +1049,14 @@ SizedBox(height: 5,),
       ),
     );
   }
-
+  Future<void> saveLoginStatus(String token,String userId,String firstName,String lastName,String countryCode,String email,String mobileNo) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+    await prefs.setString('userId', userId);
+    await prefs.setString('firstName', firstName);
+    await prefs.setString('lastName', lastName);
+    await prefs.setString('countryCode', countryCode);
+    await prefs.setString('email', email);
+    await prefs.setString('mobileNo', mobileNo);
+  }
 }

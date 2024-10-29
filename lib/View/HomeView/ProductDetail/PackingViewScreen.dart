@@ -1,19 +1,25 @@
+import 'dart:convert';
+
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-
+import '../../../data/network/AppUrl.dart';
+import '../../../models/storeBooking/StoreBookingRequest.dart';
 import '../../../res/color.dart';
 import '../../../res/style/text_style.dart';
-
-
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 class PackingViewScreen extends StatefulWidget {
   final String title;
+  final String startingFrom;
+  final String endingFrom;
+  final String startEndDate;
+  final Map<String, dynamic> bookingData;
 
-  const PackingViewScreen({Key? key, this.title = ''}) : super(key: key);
+  const PackingViewScreen({Key? key, this.title = '',required this.startingFrom,required this.endingFrom,required this.startEndDate,required this.bookingData}) : super(key: key);
 
   @override
   PackingViewPageState createState() => PackingViewPageState();
@@ -23,14 +29,32 @@ class PackingViewPageState extends State<PackingViewScreen> {
   bool _isCollapsed = true;
   bool _isExpanded = false;
   bool _isLocked = false;
-
+  String userMobile ="";
+  String token ="";
+  late Booking booking;
   final _bsbController = BottomSheetBarController();
-
+  String _selectedOptionss = "Booking Amount";
+  String amountToPay ="5000";
+  String remainingAmountToPay ="0";
+  bool visible = true;
   @override
   void initState() {
     _bsbController.addListener(_onBsbChanged);
+    booking=widget.bookingData["booking"];
+    getLoginDetails();
+
     super.initState();
   }
+
+  Future<String?> getLoginDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userMobile = prefs.getString('mobileNo').toString();
+      token = prefs.getString('token').toString();
+    });
+    return prefs.getString('mobileNo'); // return false if no value is found
+  }
+
   @override
   void dispose() {
     _bsbController.removeListener(_onBsbChanged);
@@ -53,8 +77,12 @@ class PackingViewPageState extends State<PackingViewScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text("Hello"),
-
+      title: Text("Booking Detail",style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      )),
+   backgroundColor: Colors.white,
 
     ),
     body:BottomSheetBar(
@@ -72,13 +100,12 @@ class PackingViewPageState extends State<PackingViewScreen> {
       boxShadows: [
         BoxShadow(
           color: Colors.white,
-          spreadRadius: 5.0,
-          // blurRadius: 32.0,
-          offset: const Offset(0, 0),
-          // changes position of shadow
+          //spreadRadius: 5.0,
+
         ),
       ],
       body: Container(
+          color: Colors.white,
           child: SingleChildScrollView(
             // shrinkWrap: true,
               physics: AlwaysScrollableScrollPhysics(),
@@ -88,7 +115,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                     Container(
                         margin: EdgeInsets.only(left: 14, right: 14),
                         decoration: BoxDecoration(
-                          color: Color.fromRGBO(33, 37, 41, 0.04), //Colors.white, //HexColor("212529"),
+                          color: AppColors.tooGrayColor, //HexColor("212529"),
                           border: Border.all(
                             color: Colors.white,
                           ),
@@ -104,25 +131,78 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Row( children: <Widget>[
-
-                                    Text("Traveler"),
-
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Traveler",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w300,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5,),
+                                        Text(
+                                          "You",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     Spacer(),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Phone",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w300,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5,),
+                                        Text(
+                                          booking.phone,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
 
-                                    Text("Email"),
+
 
                                   ]),
-
-                                  Text("You & Travler"),
-                                  Row( children: <Widget>[
-                                    Text("Traveler"),
-
-                                    Spacer(),
-
-                                    Text("dummymail@gmail.com"),
-
-                                  ]),
-                                  Text("+915784477389"),
+                                  SizedBox(height: 5,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Email Address",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2,),
+                                      Text(
+                                        booking.email,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
 
 
                                 ],
@@ -147,11 +227,10 @@ class PackingViewPageState extends State<PackingViewScreen> {
                           ,
                         )
                     ),
-
                     Container(
                       margin: EdgeInsets.only(left: 14, right: 14, top:  15),
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(33, 37, 41, 0.04),
+                        color: AppColors.tooGrayColor,
                         border: Border.all(
                           color: Colors.white,
                         ),
@@ -165,84 +244,66 @@ class PackingViewPageState extends State<PackingViewScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
 
-                              Text("Ladakh"),
+                              Text(
+                                booking.packageName,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ),
                               Row(
                                 ///crossAxisAlignment:  ,
                                 children: [
-
-                                  Text("Delhi to Delhi"),
+                                  Text(
+                                    widget.startingFrom+" To "+widget.endingFrom,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w200,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                   SizedBox(width: 20),
 
-                                  Text("11 Days"),
+                                  Text(
+                                    "2 days",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w200,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                   SizedBox(width: 20),
                                   //Spacer(),
-                                  Text("6 Sep to 16 Sep"),
+                                  Text(
+                                    widget.startEndDate,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w200,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+
                                 ],
                               ),
 
 
                               Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Container(
+                                    child: ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return _pricingListControl(booking.cost,index);
+                                      }, separatorBuilder: (BuildContext context, int index) => const Divider(), itemCount: booking.cost!.length,
 
-                                  children: <Widget>[
-                                    Container(
+                                    ),
 
-                                        constraints: BoxConstraints(minWidth: 230.0, minHeight: 25.0),
-
-                                        child:
-
-
-                                        ListView.builder(
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-
-                                          itemCount: 2,
-                                          itemBuilder: (BuildContext context, int index) {
-                                            return Container(
-                                                margin:  EdgeInsets.only(top:5, bottom: 5),
-                                                padding: EdgeInsets.all(10),
-
-                                                color: Colors.white60,
-
-
-                                                child: Column(children: <Widget>[
-
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                    children: <Widget>[
-
-
-                                                      Text( "EnFiled 350 CC"),
-                                                      Spacer(),
-                                                      Row(
-                                                        children:< Widget> [
-                                                          Text("Qty"),
-                                                          Text("1")
-
-                                                        ],
-                                                      ),
-
-
-                                                    ],),
-                                                  new Divider(
-                                                    color: Color.fromRGBO(33, 37, 41, 0.04),
-                                                  ),
-                                                  Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: <Widget>[
-
-                                                        Text( "Solo Rider"),
-                                                        Text( "Triple occciupancy"),
-                                                        Text( "25000"),
-
-
-                                                      ])
-
-                                                ])
-
-                                            );
-                                          },
-                                        ))]
-
-                              )
+                                  ),
+                                ],
+                              ),
 
 
                             ],)
@@ -254,43 +315,25 @@ class PackingViewPageState extends State<PackingViewScreen> {
 
 
                     ),
+                    SizedBox(height: 10,),
                     _builAllCooupan(context),
                     _buildApplyCooupan(context),
-                    Padding(padding: EdgeInsets.all(18),
-                        child: Row(
-                          children: <Widget>[
-                            Text("Join Our Membership"),
-                            Spacer(),
-                            Text("Learn More"),
+                    SizedBox(height: 20),
 
-                          ],
-                        )),
-                    _buildExploreCard(context),
-                    SizedBox(height: 15),
-                    DrifterCard(context),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildRadioOption('Booking Amount', '5000'),
+                        SizedBox(width: 10,),
+                        _buildRadioOption('Full Amount', booking.totalAmountToPay),
+                      ],
+                    ),
+
                     SizedBox(height: 15),
                     _buildDetail(context),
-                    /*ElevatedButton(onPressed: (){
-                      Razorpay razorpay = Razorpay();
-                      var options = {
-                        'key': 'rzp_live_ILgsfZCZoFIKMb',
-                        'amount': 100,
-                        'name': 'Acme Corp.',
-                        'description': 'Fine T-Shirt',
-                        'retry': {'enabled': true, 'max_count': 1},
-                        'send_sms_hash': true,
-                        'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
-                        'external': {
-                          'wallets': ['paytm']
-                        }
-                      };
-                      razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
-                      razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
-                      razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
-                      razorpay.open(options);
-                    },
-                        child: const Text("Pay with Razorpay")),
-*/
+
 
 
                   ]
@@ -330,7 +373,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  ),
                                           Text(
-                                              "₹53000.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                              "₹" + booking.totalAmount, style: AppStyle.instance.bodyToo1Semi.copyWith(
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  )
 
@@ -345,7 +388,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  ),
                                           Text(
-                                              "₹150.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                              "₹0.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  )
 
@@ -360,7 +403,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  ),
                                           Text(
-                                              "₹2400.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                              "₹0.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  )
 
@@ -390,7 +433,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  ),
                                           Text(
-                                              "₹1200.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                              "₹00.00", style: AppStyle.instance.bodyToo1Semi.copyWith(
                                             color: AppColors.txtColor,fontSize: 10,
                                           )  )
 
@@ -407,7 +450,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                             color: AppColors.blackColor,fontSize: 13,
                                           )  ),
                                           Text(
-                                              "₹55000.00", style: AppStyle.instance.bodySmallBold.copyWith(
+                                              "₹" +  booking.totalAmountToPay, style: AppStyle.instance.bodySmallBold.copyWith(
                                             color: AppColors.blackColor,fontSize: 13,
                                           )  )
 
@@ -435,7 +478,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                                   )  ),
                                   SizedBox(height: 5,),
                                   Text(
-                                      "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
+                                      "₹ "+amountToPay, style: AppStyle.instance.bodySmallBold.copyWith(
                                     color: AppColors.blackColor,fontSize: 17,
                                   )),
                                 ],
@@ -443,24 +486,8 @@ class PackingViewPageState extends State<PackingViewScreen> {
                               Spacer(flex: 1,),
                               GestureDetector(
                                 onTap: (){
+                                  bookingApi();
 
-                                  Razorpay razorpay = Razorpay();
-                                  var options = {
-                                    'key': 'rzp_live_ILgsfZCZoFIKMb',
-                                    'amount': 100,
-                                    'name': 'Acme Corp.',
-                                    'description': 'Fine T-Shirt',
-                                    'retry': {'enabled': true, 'max_count': 1},
-                                    'send_sms_hash': true,
-                                    'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
-                                    'external': {
-                                      'wallets': ['paytm']
-                                    }
-                                  };
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
-                                  razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
-                                  razorpay.open(options);
                                 },
                                 child: Container(
                                     width: 80,
@@ -501,7 +528,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                   "Cost Breakup", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
                 color: AppColors.blackColor,
               )),
-              Row(
+               Row(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,39 +539,24 @@ class PackingViewPageState extends State<PackingViewScreen> {
                       )  ),
                       SizedBox(height: 5,),
                       Text(
-                          "₹ 75,000", style: AppStyle.instance.bodySmallBold.copyWith(
+                          "₹"+amountToPay, style: AppStyle.instance.bodySmallBold.copyWith(
                         color: AppColors.blackColor,fontSize: 17,
                       )),
                     ],
                   ),
                   Spacer(flex: 1,),
-                  GestureDetector(
+                  visible ?  GestureDetector(
                     onTap: (){
 
-                      Razorpay razorpay = Razorpay();
-                      var options = {
-                        'key': 'rzp_live_ILgsfZCZoFIKMb',
-                        'amount': 100,
-                        'name': 'Acme Corp.',
-                        'description': 'Fine T-Shirt',
-                        'retry': {'enabled': true, 'max_count': 1},
-                        'send_sms_hash': true,
-                        'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
-                        'external': {
-                          'wallets': ['paytm']
-                        }
-                      };
-                      razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
-                      razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
-                      razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
-                      razorpay.open(options);
-                    },
+                          visible = false;
+                          bookingApi();
+                        },
                     child: Container(
-                        width: 80,
+                        width: 100,
                         height: 40,
                         child: Center(
                           child: Text(
-                              "Book Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
+                              "Pay Now", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 12,
                             color: AppColors.whiteColor,
                           )),
                         ),
@@ -554,7 +566,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
                         )
 
                     ),
-                  )
+                  ) : CircularProgressIndicator()
                 ],
               )
 
@@ -575,7 +587,7 @@ class PackingViewPageState extends State<PackingViewScreen> {
     * 2. Error Description
     * 3. Metadata
     * */
-    showAlertDialog(context, "Payment Failed", "Code: ${response.code}\nDescription: ${response.message}\nMetadata:${response.error.toString()}");
+   // showAlertDialog(context, "Payment Failed", "Code: ${response.code}\nDescription: ${response.message}\nMetadata:${response.error.toString()}");
   }
 
   void handlePaymentSuccessResponse(PaymentSuccessResponse response){
@@ -585,11 +597,13 @@ class PackingViewPageState extends State<PackingViewScreen> {
     * 2. Payment ID
     * 3. Signature
     * */
-    showAlertDialog(context, "Payment Successful", "Payment ID: ${response.paymentId}");
+    verifyBookingApi(response.orderId.toString(),response.paymentId.toString(),response.signature.toString());
+
+    //showAlertDialog(context, "Payment Successful", "Payment ID: ${response.paymentId}");
   }
 
   void handleExternalWalletSelected(ExternalWalletResponse response){
-    showAlertDialog(context, "External Wallet Selected", "${response.walletName}");
+    //showAlertDialog(context, "External Wallet Selected", "${response.walletName}");
   }
 
   void showAlertDialog(BuildContext context, String title, String message){
@@ -612,6 +626,313 @@ class PackingViewPageState extends State<PackingViewScreen> {
     );
   }
 
+  Widget _buildRadioOption(String title, String amount) {
+    return Container(
+     // width: 160,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: Colors.grey.shade400,
+        ),
+      ),
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedOptionss = title;
+                amountToPay=amount;
+                if(_selectedOptionss=="Booking Amount"){
+                  remainingAmountToPay=((double.parse(booking.totalAmountToPay))-(double.parse(amountToPay))).toString();
+                }else{
+                  remainingAmountToPay="0";
+                }
+              });
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+
+              children: [
+                Radio<String>(
+                  value: title,
+                  groupValue: _selectedOptionss,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedOptionss = value!;
+                      amountToPay=amount;
+                      if(_selectedOptionss=="Booking Amount"){
+                        remainingAmountToPay=((double.parse(booking.totalAmountToPay))-(double.parse(amountToPay))).toString();
+                      }else{
+                        remainingAmountToPay="0";
+                      }
+                    });
+                  },
+                  activeColor: Colors.blue,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5,),
+                    Text(
+                      'Total - $amount',
+                      style: TextStyle(
+                        fontSize: 10.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetail(BuildContext context) {
+    return Container(
+        decoration: BoxDecoration(
+          color: AppColors.tooGrayColor, //HexColor("212529"),
+          border: Border.all(
+            color: Colors.white,
+          ),
+          borderRadius: BorderRadius.circular(14),
+        ),
+
+        margin: EdgeInsets.only(left: 16, right: 16),
+        padding:  EdgeInsets.all(8),
+        child:Column(
+            mainAxisAlignment:  MainAxisAlignment.start,
+            children: <Widget>[
+              Row( children: <Widget>[
+                Text("Amount",style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey,
+                ),),
+                Spacer(),
+                Text("₹"+booking.totalAmount,style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey,
+                )),
+
+              ],
+              ),
+              SizedBox(height: 5,),
+              Row( children: <Widget>[
+                Text("GST(5%)",style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey,
+                )),
+                Spacer(),
+                Text("₹"+booking.totalGst,style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey,
+                )),
+              ],
+              ),
+              SizedBox(height: 5,),
+
+              Row( children: <Widget>[
+                Text("Subtotal",style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+                Spacer(),
+                Text("₹"+booking.totalAmountToPay,style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+              ],
+              ),
+              Divider(),
+              Row( children: <Widget>[
+                Text("Amount To Pay",style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+                Spacer(),
+                Text("₹"+amountToPay,style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+              ],
+              ),
+              _selectedOptionss=="Booking Amount"?Row( children: <Widget>[
+                Text("Remaining Amount",style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+                Spacer(),
+                Text("₹"+remainingAmountToPay,style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.blueGrey,
+                )),
+              ],
+              ):Row(),
+            ]) );
+   }
+
+  void bookingApi() async {
+
+    print(json.encode(booking));
+    visible = false;
+    booking.remainingAmount=remainingAmountToPay;
+    String stringValue = amountToPay; // Example string value
+    double value = double.parse(stringValue); // Convert string to double
+    double finalPay = value * 100; // Multiply by 100
+
+    var headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
+    final Map<String, dynamic> body = {
+      "booking": booking,
+      "secret_code": "12345",
+      "payment_method": "Mobile Wallets"
+    };
+
+    // Convert the map to a JSON string
+    final data = jsonEncode(body);
+    try{
+      Response response = await post(
+          Uri.parse(AppUrl.booking),
+          headers: headers,
+          body:  data
+      );
+      print(response.body);
+      if(response.statusCode == 200){
+        visible = true;
+        Razorpay razorpay = Razorpay();
+        var options = {
+          'key': 'rzp_test_jrFPz3u3W90033',
+          'amount': 1,
+          'name': booking.packageName,
+          'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+          'external': {
+            'wallets': ['paytm']
+          }
+        };
+        razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
+        razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
+        razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
+        razorpay.open(options);
+
+
+      }else {
+
+          visible = true;
+
+        print('failed');
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+       }
+    }catch(e){
+      print(e.toString());
+      visible = true;
+      Fluttertoast.showToast(
+          msg: "error"+e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0
+
+      );
+    }
+  }
+
+  void verifyBookingApi(String razorpay_order_id,String razorpay_payment_id,String razorpay_signature) async {
+    var headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
+    final Map<String, dynamic> body = {
+      "razorpay_order_id": razorpay_order_id,
+      "razorpay_payment_id": razorpay_payment_id,
+      "razorpay_signature": razorpay_signature
+    };
+
+    // Convert the map to a JSON string
+    final data = jsonEncode(body);
+    try{
+      Response response = await post(
+          Uri.parse(AppUrl.verifyBooking),
+          headers: headers,
+          body:  data
+      );
+      print(response.body);
+      if(response.statusCode == 200){
+        showSuccessDialog(context,"success");
+
+
+        /*Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );*/
+      }else {
+        print('failed');
+        showSuccessDialog(context,"failed");
+
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+      }
+    }catch(e){
+      print(e.toString());
+      Fluttertoast.showToast(
+          msg: "error"+e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
+  }
 }
 Widget _builAllCooupan(BuildContext context) {
   return Container(
@@ -623,9 +944,20 @@ Widget _builAllCooupan(BuildContext context) {
 
 
         Row( children: <Widget>[
-          Text("Apply Coupon"),
+          Text("Apply Coupon",
+            style: TextStyle(
+              fontSize: 15 ,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
           Spacer(),
-          Text("View Offers"),
+          Text("View Offers",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+              color: Colors.black,
+            ),),
 
         ],
 
@@ -649,7 +981,11 @@ Widget _builAllCooupan(BuildContext context) {
                   onTap: (){
                     showDataAlert(context);
                   },
-                  child: Text("Coupon & Offers")),
+                  child: Icon(
+                    Icons.chevron_right, // or Icons.chevron_right
+                    size: 24.0,
+                    color: Colors.black,
+                  ),),
 
 
             ])
@@ -658,6 +994,84 @@ Widget _builAllCooupan(BuildContext context) {
       ]) );
 
 }
+
+Widget _pricingListControl(List<Cost> price, int index) => Padding(
+  padding: const EdgeInsets.only(left: 0,right: 0,top: 5,bottom: 2),
+  child: Container(
+    padding: EdgeInsets.all(10),
+    decoration: new BoxDecoration(
+      color:Colors.white,
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey,
+          offset: Offset(0.0, 1.0), //(x,y)
+          blurRadius: 2.0,
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(price![index].travelModeName, style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+        )),
+        SizedBox(height: 10,),
+        Divider(height: 1,color: AppColors.grayTextColor,),
+        SizedBox(height: 10,),
+        Container(
+          padding: EdgeInsets.all(1),
+          decoration: new BoxDecoration(
+            color:Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          child:  Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              price![index].riderName.replaceAll("[", "").replaceAll("]", ""),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+                color: Colors.black,
+              )
+            ),
+            Text(
+              '₹ '+price![index].packagePrice,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        )
+        /*Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+
+
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return _pricingSubListControl();
+                  }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: 2,
+
+                ),
+
+              ),
+            ],
+          ),*/
+      ],
+    ),
+  ),
+);
+
 
 Widget _buildApplyCooupan(BuildContext context) {
   return Container(
@@ -669,7 +1083,11 @@ Widget _buildApplyCooupan(BuildContext context) {
 
 
         Row( children: <Widget>[
-          Text("Have Gift Card"),
+          Text("Have Gift Card",style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),),
           Spacer(),
 
 
@@ -689,13 +1107,21 @@ Widget _buildApplyCooupan(BuildContext context) {
 
             padding:  EdgeInsets.all(8),
             child: Row( children: <Widget>[
-              Text("Gift Card Code"),
+              Text("Gift Card Code",style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey,
+              )),
               Spacer(),
               GestureDetector(
                   onTap: (){
                     giftCardAlert(context);
                   },
-                  child: Text("Apply")),
+                  child: Text("Apply",style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blueAccent,
+                  ))),
 
 
             ])
@@ -743,59 +1169,6 @@ Widget _buildExploreCard(BuildContext context) {
             ],
 
             ),
-
-          ]) );
-
-}
-Widget _buildDetail(BuildContext context) {
-  return Container(
-
-      margin: EdgeInsets.only(left: 16, right: 16),
-      padding:  EdgeInsets.all(8),
-      child:Column(
-          mainAxisAlignment:  MainAxisAlignment.start,
-          children: <Widget>[
-            Row( children: <Widget>[
-              Text("Amount"),
-              Spacer(),
-              Text("₹53000.00"),
-
-            ],
-            ),
-            Row( children: <Widget>[
-              Text("Charges"),
-              Spacer(),
-              Text("₹150.00"),
-            ],
-            ),
-            Row( children: <Widget>[
-              Text("GST"),
-              Spacer(),
-              Text("₹2400.00"),
-            ],
-            ),
-
-            Row( children: <Widget>[
-              Text("Discount"),
-              Spacer(),
-              Text("-₹0.00"),
-            ],
-            ),
-            Row( children: <Widget>[
-              Text("TCS (Tax collection at source)"),
-              Spacer(),
-              Text("₹1200.00"),
-            ],
-            ),
-            Divider(),
-            Row( children: <Widget>[
-              Text("Subtotal"),
-              Spacer(),
-              Text("₹55000.00"),
-            ],
-            ),
-
-
 
           ]) );
 
@@ -1108,4 +1481,81 @@ Widget _giftCard(int index){
       ),
     ),
   );
+
+
+
 }
+
+void showSuccessDialog(BuildContext context,String status) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        contentPadding: const EdgeInsets.all(16.0),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: status=="success"?Colors.green:Colors.red,
+              size: 60,
+            ),
+            const SizedBox(height: 16),
+            status=="success"?Text(
+              'Transaction Successful!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ):Text(
+              'Transaction Failed!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            status=="success"?Text(
+              'Your transaction  completed successfully.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ):Text(
+              'Your transaction Failed.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.green),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+
+
+
+

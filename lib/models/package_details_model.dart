@@ -1040,6 +1040,7 @@ class Prices {
   String? riderName;
   int? price;
   int? discountedPrice;
+  int? qty =0;
   int? id;
 
   Prices(
@@ -1051,6 +1052,7 @@ class Prices {
         this.riderName,
         this.price,
         this.discountedPrice,
+        this.qty,
         this.id});
 
   Prices.fromJson(Map<String, dynamic> json) {
@@ -1065,6 +1067,7 @@ class Prices {
     riderName = json['rider_name'];
     price = json['price'];
     discountedPrice = json['discounted_price'];
+    qty = json['qty'];
     id = json['id'];
   }
 
@@ -1078,6 +1081,7 @@ class Prices {
     data['rider_name'] = this.riderName;
     data['price'] = this.price;
     data['discounted_price'] = this.discountedPrice;
+    data['qty'] = this.qty;
     data['id'] = this.id;
     return data;
   }

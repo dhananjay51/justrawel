@@ -1,11 +1,17 @@
+import 'dart:ffi';
+
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../models/package_details_model.dart';
+import '../../../models/storeBooking/StoreBookingRequest.dart';
 import '../../../res/color.dart';
 import '../../../res/style/text_style.dart';
 import 'package:justwravel/View/onboard/LoginScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../ProductDetail/PackingViewScreen.dart';
 
 
 class BatchSelectionWidget extends StatefulWidget {
@@ -32,8 +38,24 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
   int selectedOption = 0; // 0 for "Double", 1 for "Triple"
   List<Prices>?  priceoccupancyType = [] ;
   List<Map<String, dynamic>> finalList = [];
-  int updatePrice = 0;
+  double updatePrice = 0.0;
+  double updatePriceWithoutGST = 0.0;
   int updatePriceQty = 0;
+  String token ="";
+  String userMobile ="";
+  String userId ="";
+  String userFirstName ="";
+  String userLastName ="";
+  String userEmail ="";
+  String userCountryCode ="";
+  String eventDate ="";
+  String startEndDate ="";
+  double totalGst =0 ;
+  double totalNumberGst =0 ;
+  List<Cost> costList=[];
+
+  late Booking booking;
+
   @override
   void initState() {
     _bsbController.addListener(_onBsbChanged);
@@ -43,7 +65,7 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
     widget.packageDetail.prices!.forEach((item) {
       addUniqueValue(numbers,item.occupancyName.toString());
     });
-
+    getLoginDetails();
     priceoccupancyType = widget.packageDetail.prices!.where((occupancy) {
       return occupancy.occupancyName!.contains(numbers[0].toString());
     }).toList();
@@ -80,6 +102,9 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
 
     super.initState();
   }
+
+
+
   @override
   void dispose() {
     _bsbController.removeListener(_onBsbChanged);
@@ -145,11 +170,16 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                             // Add navigation or functionality for back button here
                           });
                         },
-                        child: Container(
-                          child: Image(
-                            image: AssetImage("assets/images/Back_icon.png"),
-                            height: 30,
-                            width: 30,
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            child: Image(
+                              image: AssetImage("assets/images/Back_icon.png"),
+                              height: 30,
+                              width: 30,
+                            ),
                           ),
                         ),
                       ),
@@ -176,7 +206,7 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-          
+
                       decoration: BoxDecoration(
                         color: Colors.white, // Background color
                         borderRadius: BorderRadius.circular(12), // Rounded corners
@@ -204,7 +234,7 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                           SizedBox(height: 5,),
                           Divider(height: 1,color: AppColors.grayTextColor,),
                           SizedBox(height: 5,),
-          
+
                           // Scrollable month tab row
                           Row(
                             children: [
@@ -252,13 +282,13 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
 
                             ],
                           ),
-          
+
                           // GridView for batches without Expanded
                           Container(
 
                             child: GridView.builder(
                               shrinkWrap: true, // This allows the GridView to take up only the space it needs
-                              // physics: NeverScrollableScrollPhysics(), // Disable scrolling on GridView to use the outer scroll
+                               physics: NeverScrollableScrollPhysics(), // Disable scrolling on GridView to use the outer scroll
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 childAspectRatio: 2.8, // Adjust for desired height/width ratio
@@ -274,19 +304,19 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                         ],
                       ),
                     ),
-          
+
                   ),
                 ),
               ),
               SizedBox(height: 10,),
-          
+
               SizedBox(
 
                 child: Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-          
+
                       decoration: BoxDecoration(
                         color: Colors.white, // Background color
                         borderRadius: BorderRadius.circular(12), // Rounded corners
@@ -347,6 +377,11 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                                           } else {
                                             // If not present, create a new entry for the travel_mode_id
                                             groupedByTravelMode[travelModeId!!] = {
+                                              'id': price.id,
+                                              'occupancy_id': price.occupancyId,
+                                              'rider_id': price.riderId,
+                                              'rider_name': price.riderName,
+                                              'discounted_price': price.discountedPrice,
                                               'travel_mode_id': travelModeId,
                                               'travel_mode_name': travelModeName,
                                               'rider_names': riderName != null ? [riderName] : [price.occupancyName],
@@ -418,7 +453,7 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                               Container(
                                 child: ListView.separated(
                                   shrinkWrap: true,
-                                  physics: ScrollPhysics(),
+                                  physics: NeverScrollableScrollPhysics(),
                                   itemBuilder: (BuildContext context, int index) {
                                     return _pricingListControl(finalList,index);
                                   }, separatorBuilder: (BuildContext context, int index) => const Divider(color: Colors.white,), itemCount: finalList!.length,
@@ -440,12 +475,12 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                         ],
                       ),
                     ),
-          
+
                   ),
                 ),
               ),
               SizedBox(height: 10,),
-              GestureDetector(
+             /* GestureDetector(
                 onTap: (){
                   showCouponDialog(context);
                 },
@@ -478,7 +513,7 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                     ),
                   ),
                 ),
-              ),
+              ),*/
               SizedBox(height: 30,),
 
 
@@ -626,14 +661,13 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                                     )  ),
                                     SizedBox(height: 5,),
                                     Text(
-                                        "₹ "+updatePrice.toString()+".00", style: AppStyle.instance.bodySmallBold.copyWith(
+                                        NumberFormat.currency(locale: 'en_IN', symbol: '₹').format(updatePrice), style: AppStyle.instance.bodySmallBold.copyWith(
                                       color: AppColors.blackColor,fontSize: 17,
                                     )),
                                   ],
                                 ),
                                 Spacer(flex: 1,),
                                 Container(
-
                                     width: 80,
                                     height: 40,
                                     child: Center(
@@ -682,30 +716,93 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                         )  ),
                         SizedBox(height: 5,),
                         Text(
-                            "₹ "+updatePrice.toString()+".00", style: AppStyle.instance.bodySmallBold.copyWith(
+                           NumberFormat.currency(locale: 'en_IN', symbol: '₹').format(updatePrice), style: AppStyle.instance.bodySmallBold.copyWith(
                           color: AppColors.blackColor,fontSize: 17,
                         )),
                       ],
                     ),
                     Spacer(flex: 1,),
                     GestureDetector(
-                       onTap: (){
-                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
-                       },
-                      child: Container(
-                          width: 80,
-                          height: 40,
-                          child: Center(
-                            child: Text(
-                                "Continue", style: AppStyle.instance.bodyToo1Semi.copyWith(fontSize: 10,
-                              color: AppColors.whiteColor,
-                            )),
-                          ),
-                          decoration: BoxDecoration(
-                              color: AppColors.appbarlinearColor,
-                              borderRadius: BorderRadius.all(Radius.circular(50))
-                          )
+                       onTap: () async{
 
+
+
+                           booking = Booking(
+                           packageId: widget.packageDetail.id!.toString(),
+                           userId: userId,
+                           packageName: widget.packageDetail.title!.toString(),
+                           firstName: userFirstName,
+                           lastName: userLastName,
+                           email: userEmail,
+                           ccEmail: "jio1@gmail.com,jio2@gmail.com",
+                           phone: userMobile,
+                           countryCode: userCountryCode,
+                           noOfDays: "2",
+                           eventDate: eventDate,
+                           totalPax: "5",
+                           totalCost: "5000",
+                           totalDiscount: "5000",
+                           totalGst: totalNumberGst.toString(),
+                           totalAmount: updatePriceWithoutGST.toString(),
+                           isCreditNoteUsed: "0",
+                           isGiftCardUsed: "0",
+                           totalAmountToPay: updatePrice.toString(),
+                           totalAmountPaid: "12",
+                           remainingAmount: "",
+                           roundOffAmount: "68",
+                           convenienceFee: "68",
+                           paymentType: "upi",
+                           cost: costList
+                         );
+
+                           Map<String, dynamic> bookingData ={
+                             "booking":booking,
+                             "secret_code": "",
+                             "payment_method": "Mobile Wallets"
+
+                           };
+
+
+                         print("Moible"+userMobile);
+                         if(userMobile=="null"){
+                           if(updatePrice<1){
+                           }else{
+                             Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen(startingFrom: widget.packageDetail.startingFrom!.toString(),endingFrom: widget.packageDetail.endingTo!.toString(),startEndDate:startEndDate,bookingData: bookingData,)));
+                           }
+                         }else{
+                           if(updatePrice<1){
+                           }else{
+                             Navigator.of(context).push(MaterialPageRoute(builder: (context) => PackingViewScreen(startingFrom: widget.packageDetail.startingFrom!.toString(),endingFrom: widget.packageDetail.endingTo!.toString(),startEndDate:startEndDate,bookingData: bookingData,)));
+                           }
+                         }
+                         },
+                      child: Container(
+                        width: 100,
+                        height: 50,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center, // Centers the texts vertically
+                          crossAxisAlignment: CrossAxisAlignment.center, // Centers the texts horizontally
+                          children: [
+                            Text(
+                              "Continue",
+                              style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                fontSize: 12,
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                            Text(
+                              "at ₹ 5,000",
+                              style: AppStyle.instance.bodyToo1Semi.copyWith(
+                                fontSize: 8,
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.appbarlinearColor,
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                        ),
                       ),
                     )
                   ],
@@ -727,10 +824,17 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
   // Widget for Batch Cards
   Widget _buildBatchCard(List<Batches>?  batches, int index) {
     bool isSelected = index == selectedBatchIndex;
+    eventDate=batches![selectedBatchIndex].startdate.toString();
+    startEndDate =formatDate(batches![selectedBatchIndex].startdate.toString())+" To "+formatDate(batches![selectedBatchIndex].lastdate.toString());
+    print(eventDate);
     return GestureDetector(
       onTap: () {
         setState(() {
           selectedBatchIndex = index;
+          eventDate=batches![selectedBatchIndex].startdate.toString();
+          startEndDate =formatDate(batches![selectedBatchIndex].startdate.toString())+" To "+formatDate(batches![selectedBatchIndex].lastdate.toString());
+          print(eventDate);
+
         });
       },
       child: Container(
@@ -964,20 +1068,27 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               GestureDetector(
-
                                 child: SizedBox(
-                                    width:7,
-                                    child: Divider(height: 2,color: Colors.black,)
-
+                                  child: Icon( Icons.remove, color: Colors.black,size: 15, ),
                                 ),
                                 onTap: (){
                                   setState(() {
                                    // updatePriceQty= updatePriceQty-1;
                                     if(price![index]['prices'][riderIndex]["qty"]==0){
-
                                     }else{
                                       price![index]['prices'][riderIndex]["qty"]=(price![index]['prices'][riderIndex]["qty"])-1;
-                                      updatePrice=(price![index]['prices'][riderIndex]["price"])-updatePrice;
+                                      double pricePerCost= double.parse(price![index]['prices'][riderIndex]["price"].toString());
+                                      totalGst=getPercentage(pricePerCost, 5);
+                                      totalNumberGst=totalNumberGst-totalGst;
+                                      double priceWithGst=(price![index]['prices'][riderIndex]["price"])+totalGst;
+                                      updatePrice=updatePrice-priceWithGst;
+                                      updatePriceWithoutGST=updatePriceWithoutGST-(price![index]['prices'][riderIndex]["price"]);
+                                      costList.removeLast();
+                                      costList.forEach((entry) {
+                                        print(entry);
+
+                                      });
+                                      //updatePrice = updatePriceN-getPercentage(updatePrice,5);
                                     }
 
                                   });
@@ -995,21 +1106,48 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
                               GestureDetector(
                                 onTap: (){
                                   setState(() {
-                                   // updatePriceQty= updatePriceQty+1;
+                                    // updatePriceQty= updatePriceQty+1;
                                     price![index]['prices'][riderIndex]["qty"]=(price![index]['prices'][riderIndex]["qty"])+1;
+                                    double pricePerCost= double.parse(price![index]['prices'][riderIndex]["price"].toString());
+                                    totalGst=getPercentage(pricePerCost, 5);
+                                    totalNumberGst=totalGst+totalNumberGst;
+                                    double priceWithGst=(price![index]['prices'][riderIndex]["price"])+totalGst;
+                                    updatePrice=priceWithGst+updatePrice;
+                                    updatePriceWithoutGST=(price![index]['prices'][riderIndex]["price"])+updatePriceWithoutGST;
 
-                                    updatePrice=(price![index]['prices'][riderIndex]["price"])+updatePrice;
+
+                                    Cost exampleCost = Cost(
+                                      packageItineraryId: price![index]["id"]?.toString() ?? "1",
+                                      travelModeId: price![index]["travel_mode_id"]?.toString() ?? "1",
+                                      travelModeName: (price![index]["travel_mode_name"]?.toString() ?? "").isEmpty ? "1" : price![index]["travel_mode_name"].toString(),
+                                      riderId: price![index]["rider_id"]?.toString() ?? "",
+                                      riderName: (price![index]['rider_names'][riderIndex] ?? "").isEmpty ? "1" : price![index]['rider_names'][riderIndex].toString(),
+                                      occupancyId: price![index]["occupancy_id"]?.toString() ?? "2",
+                                      occupancyName: (price![index]['prices'][riderIndex]["occupancy_name"]?.toString() ?? "").isEmpty ? "1" : price![index]['prices'][riderIndex]["occupancy_name"].toString(),
+                                      packagePrice: (price![index]['prices'][riderIndex]["price"]?.toString() ?? "").isEmpty ? "1" : price![index]['prices'][riderIndex]["price"].toString(),
+                                      packageDiscount: (price![index]["discounted_price"]?.toString() ?? "").isEmpty ? "1" : price![index]["discounted_price"].toString(),
+                                      packagePriceAfterDiscount: "499",
+                                      packageGst: (totalGst?.toString() ?? "").isEmpty ? "1" : totalGst.toString(),
+                                     // pax: ((price![index]['prices'][riderIndex]["qty"] ?? 1) - 1).toString(),
+                                      pax: "1",
+                                      amount: (price![index]['prices'][riderIndex]["price"]?.toString() ?? "").isEmpty ? "1" : price![index]['prices'][riderIndex]["price"].toString(),
+                                    );
+                                    if (!costList.any((cost) => cost.packageItineraryId == exampleCost.packageItineraryId)) {
+                                      costList.add(exampleCost);
+                                    }
+                                   /* if (!costList.contains(exampleCost)) {
+                                      costList.add(exampleCost);
+                                    }*/
+                                   // costList.add(exampleCost);
+                                   /* for (var i in costList!) {
+                                      print(i.packagePrice);
+                                    }*/
+                                                                        //updatePrice=updatePriceN+getPercentage(updatePrice,5);
 
 
                                   });
                                 },
-                                child: Text(
-                                  "+",
-                                  style: TextStyle(fontSize: 15,
-                                    fontWeight: FontWeight.w300,
-
-                                  ),
-                                ),
+                                child: Icon( Icons.add, color: Colors.black,size: 15, ),
                               ),
                             ],
                           ),
@@ -1122,6 +1260,23 @@ class _BatchSelectionWidgetState extends State<BatchSelectionWidget> {
         );
       },
     );
+  }
+  Future<String?> getLoginDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs.getString('token').toString();
+      userId = prefs.getString('userId').toString();
+      userFirstName = prefs.getString('firstName').toString();
+      userLastName = prefs.getString('lastName').toString();
+      userCountryCode = prefs.getString('countryCode').toString();
+      userEmail = prefs.getString('email').toString();
+      userMobile = prefs.getString('mobileNo').toString();
+    });
+    return prefs.getString('mobileNo'); // return false if no value is found
+  }
+
+  double getPercentage(double value, double percentage) {
+    return (value * percentage) / 100;
   }
 }
 

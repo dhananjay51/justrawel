@@ -442,7 +442,7 @@ class _ProItemsState extends State<ProItems> {
                                 topLeft: Radius.circular(10),
                                 topRight: Radius.circular(10),
                               ),
-                              color: Colors.redAccent,
+                              color: Colors.white,
                             ),
                           ),
                           Positioned(
